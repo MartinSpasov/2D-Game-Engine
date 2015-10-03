@@ -14,7 +14,7 @@ public class Mesh {
 	private int vaoId;
 	private int vertBufferId;
 	private int uvBufferId;
-	public int modelMatrixufferId;
+	private int mvpMatrixBufferId;
 	
 	private int numVertices;
 
@@ -38,8 +38,8 @@ public class Mesh {
 		GL20.glEnableVertexAttribArray(1);
 		GL20.glVertexAttribPointer(1, 2, GL11.GL_FLOAT, false, 0, 0);
 		
-		modelMatrixufferId = GL15.glGenBuffers();
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, modelMatrixufferId);
+		mvpMatrixBufferId = GL15.glGenBuffers();
+		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, mvpMatrixBufferId);
 		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, Game.MAX_INSTANCE_COUNT * 4 * 16, GL15.GL_DYNAMIC_DRAW);
 		
 		for (int i = 0; i < 4; i++) {
@@ -60,9 +60,14 @@ public class Mesh {
 		return vaoId;
 	}
 	
+	public int getMvpMatrixBufferId() {
+		return mvpMatrixBufferId;
+	}
+	
 	public void destroy() {
 		GL15.glDeleteBuffers(vertBufferId);
 		GL15.glDeleteBuffers(uvBufferId);
+		GL15.glDeleteBuffers(mvpMatrixBufferId);
 		GL30.glDeleteVertexArrays(vaoId);
 	}
 }

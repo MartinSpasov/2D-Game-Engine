@@ -129,8 +129,8 @@ public class Game implements KeyListener {
 		for (int i = 2; i <= 10000; i++) {
 			GameObject object = new GameObject(new Transform(), mesh, texture);
 			object.getTransform().setZPos(-1 * i);
-			object.getTransform().setXPos((2 * rand.nextFloat()) - 1.0f);
-			object.getTransform().setYPos((2 * rand.nextFloat()) - 1.0f);
+			object.getTransform().setXPos((3 * rand.nextFloat()) - 1.0f);
+			object.getTransform().setYPos((3 * rand.nextFloat()) - 1.0f);
 			scene.addObject(object);
 		}
 	}
@@ -192,7 +192,6 @@ public class Game implements KeyListener {
 	public void render() {
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 		scene.render();
-		renderer.render(testObject.getMesh(), testObject.getTexture());
 	}
 	
 	public void destroy() {

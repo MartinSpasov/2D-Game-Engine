@@ -1,4 +1,5 @@
 package engine.resource;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -34,7 +35,7 @@ public class PNGDecoder {
 					
 				}
 			}
-			
+			input.close();
 		} 
 		catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
