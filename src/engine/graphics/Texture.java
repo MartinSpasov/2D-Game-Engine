@@ -1,4 +1,5 @@
 package engine.graphics;
+
 import java.nio.ByteBuffer;
 
 import org.lwjgl.opengl.GL11;

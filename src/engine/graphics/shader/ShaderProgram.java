@@ -1,4 +1,4 @@
-package engine.graphics;
+package engine.graphics.shader;
 
 import org.lwjgl.opengl.GL20;
 
@@ -6,7 +6,9 @@ public class ShaderProgram {
 
 	private int programId;
 	
-	public ShaderProgram(String vertSrc, String fragSrc) {
+	private Uniform[] uniforms;
+	
+	public ShaderProgram(String vertSrc, String fragSrc, String[] uniforms) {
 		// TODO handle shader compilation error
 		int vertShaderId = GL20.glCreateShader(GL20.GL_VERTEX_SHADER);
 		GL20.glShaderSource(vertShaderId, vertSrc);
@@ -26,6 +28,13 @@ public class ShaderProgram {
 		GL20.glAttachShader(programId, fragShaderId);
 		GL20.glLinkProgram(programId);
 		
+		
+		//GL20.glGetUniformLocation(programId, "diffuseTexture");
+		this.uniforms = new Uniform[uniforms.length];
+		for (int i = 0; i < uniforms.length; i++) {
+			this.uniforms[i] = new Uniform(uniforms[i], this);
+		}
+		
 		// Clean up.
 		GL20.glDetachShader(programId, vertShaderId);
 		GL20.glDetachShader(programId, fragShaderId);
@@ -36,6 +45,10 @@ public class ShaderProgram {
 	
 	public int getProgramId() {
 		return programId;
+	}
+	
+	public Uniform[] getUniforms() {
+		return uniforms;
 	}
 	
 	public void destroy() {

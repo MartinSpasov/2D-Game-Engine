@@ -10,18 +10,18 @@ import engine.object.GameObject;
 
 public class MeshBatch {
 
-	private Mesh mesh;
+	private InstancedMesh mesh;
 	private Texture texture;
 	
 	private ArrayList<Matrix4f> modelMatrices;
 	
-	public MeshBatch(Mesh mesh, Texture texture) {
+	public MeshBatch(InstancedMesh mesh, Texture texture) {
 		this.mesh = mesh;
 		this.texture = texture;
 		modelMatrices = new ArrayList<Matrix4f>();
 	}
 	
-	public MeshBatch(GameObject[] objects, Mesh mesh, Texture texture) {
+	public MeshBatch(GameObject[] objects, InstancedMesh mesh, Texture texture) {
 		this(mesh, texture);
 		
 		for (int i = 0; i < objects.length; i++) {
@@ -68,7 +68,7 @@ public class MeshBatch {
 		
 	}
 	
-	public Mesh getMesh() {
+	public InstancedMesh getMesh() {
 		return mesh;
 	}
 	

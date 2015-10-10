@@ -15,7 +15,7 @@ import org.lwjgl.opengl.GL11;
 import de.matthiasmann.twl.utils.PNGDecoder.Format;
 import engine.console.Console;
 import engine.graphics.Camera;
-import engine.graphics.Mesh;
+import engine.graphics.InstancedMesh;
 import engine.graphics.RenderEngine;
 import engine.graphics.Texture;
 import engine.input.Input;
@@ -50,6 +50,8 @@ public class Game implements KeyListener {
 	
 	public static final int MAX_INSTANCE_COUNT = 10000;
 	//private double counter;
+	
+	public static InstancedMesh mesh;
 	
 	public static void main(String[] args) {
 		Game game = new Game();
@@ -98,7 +100,7 @@ public class Game implements KeyListener {
 		}
 		uvs.flip();
 		
-		Mesh mesh = new Mesh(verts, uvs);
+		mesh = new InstancedMesh(verts, uvs, MAX_INSTANCE_COUNT);
 		
 		
 		// Texture

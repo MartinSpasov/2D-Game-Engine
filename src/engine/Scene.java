@@ -3,6 +3,7 @@ package engine;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import engine.graphics.InstancedMesh;
 import engine.graphics.Mesh;
 import engine.graphics.MeshBatch;
 import engine.graphics.RenderEngine;
@@ -13,12 +14,12 @@ public class Scene {
 	private RenderEngine renderer;
 	private ArrayList<GameObject> objects;
 	
-	private HashMap<Mesh, MeshBatch> batches;
+	private HashMap<InstancedMesh, MeshBatch> batches;
 	
 	public Scene(RenderEngine renderer) {
 		this.renderer = renderer;
 		objects = new ArrayList<GameObject>();
-		batches = new HashMap<Mesh, MeshBatch>();
+		batches = new HashMap<InstancedMesh, MeshBatch>();
 	}
 	
 	public void tick() {
@@ -28,14 +29,16 @@ public class Scene {
 	public void render() {
 		for (GameObject object : objects) {
 			// Should move all this render stuff to RenderEngine
-			MeshBatch batch = batches.get(object.getMesh());
+			if (object.getMesh() instanceof InstancedMesh) {
+				MeshBatch batch = batches.get(object.getMesh());
 			
-			if (batch == null) {
-				batch = new MeshBatch(object.getMesh(), object.getTexture());
-				batches.put(object.getMesh(), batch);
+				if (batch == null) {
+					batch = new MeshBatch((InstancedMesh)object.getMesh(), object.getTexture());
+					batches.put((InstancedMesh)object.getMesh(), batch);
+				}
+			
+				batch.addToBatch(object);
 			}
-			
-			batch.addToBatch(object);
 		}
 		
 		for (Mesh mesh : batches.keySet()) {
