@@ -14,6 +14,7 @@ import org.lwjgl.opengl.GL11;
 
 import de.matthiasmann.twl.utils.PNGDecoder.Format;
 import engine.console.Console;
+import engine.console.Logger;
 import engine.graphics.Camera;
 import engine.graphics.InstancedMesh;
 import engine.graphics.RenderEngine;
@@ -30,6 +31,7 @@ public class Game implements KeyListener {
 	private RenderEngine renderer;
 	private Input input;
 	private Console console;
+	private Logger logger;
 	
 	private GameObject testObject;
 	private Camera testCam;
@@ -60,6 +62,8 @@ public class Game implements KeyListener {
 	}
 	
 	public Game() {
+		logger = new Logger(System.out);
+		logger.log("Initializing subsystems.");
 		window = new Window(500,500, "Test");
 		
 		float l = -1;
@@ -79,8 +83,9 @@ public class Game implements KeyListener {
 		input = new Input(window);
 		input.addKeyListener(this);
 		console = new Console();
-		scene = new Scene(renderer);
 		
+		logger.log("Loading scene.");
+		scene = new Scene(renderer);
 		
 		FloatBuffer verts = BufferUtils.createFloatBuffer(RenderEngine.PLANE_VERTS.length);
 		for (int i = 0; i < RenderEngine.PLANE_VERTS.length; i++) {
@@ -142,6 +147,8 @@ public class Game implements KeyListener {
 		double counter = 0;
 		double delta = 0;
 		double currentTime = 0;
+		
+		logger.log("Entering loop.");
 		
 		while (GLFW.glfwWindowShouldClose(window.getId()) == GL11.GL_FALSE) {
 			currentTime = GLFW.glfwGetTime();
