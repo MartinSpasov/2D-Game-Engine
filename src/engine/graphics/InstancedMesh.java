@@ -45,6 +45,7 @@ public class InstancedMesh extends Mesh {
 	@Override
 	public void destroy() {
 		GL15.glDeleteBuffers(mvpMatrixBufferId);
+		super.destroy();
 	}
 
 }
