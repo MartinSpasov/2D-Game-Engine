@@ -24,6 +24,8 @@ import engine.input.KeyListener;
 import engine.math.Matrix4f;
 import engine.object.GameObject;
 import engine.object.Transform;
+import engine.physics.collision.CollisionEngine;
+import engine.physics.geometry.Rectangle;
 
 public class Game implements KeyListener {
 
@@ -32,8 +34,8 @@ public class Game implements KeyListener {
 	private Input input;
 	private Console console;
 	private Logger logger;
+	private CollisionEngine collisionHandler;
 	
-	private GameObject testObject;
 	private Camera testCam;
 	
 	private Scene scene;
@@ -86,6 +88,7 @@ public class Game implements KeyListener {
 		
 		logger.log("Loading scene.");
 		scene = new Scene(renderer);
+		collisionHandler = new CollisionEngine();
 		
 		FloatBuffer verts = BufferUtils.createFloatBuffer(RenderEngine.PLANE_VERTS.length);
 		for (int i = 0; i < RenderEngine.PLANE_VERTS.length; i++) {
@@ -127,19 +130,18 @@ public class Game implements KeyListener {
 		
 		Texture texture = new Texture(data, decoder.getWidth(), decoder.getHeight());
 		
-		testObject = new GameObject(new Transform(), mesh, texture);
-		testObject.getTransform().setZPos(-1);
-		scene.addObject(testObject);
 		//PNGDecoder decode = new PNGDecoder("megaman.png");
 		Random rand = new Random();
 		
-		for (int i = 2; i <= 10000; i++) {
-			GameObject object = new GameObject(new Transform(), mesh, texture);
+		for (int i = 1; i <= 100; i++) {
+			GameObject object = new GameObject(new Transform(), mesh, texture, new Rectangle(1.0f,1.0f));
 			object.getTransform().setZPos(-1 * i);
 			object.getTransform().setXPos((3 * rand.nextFloat()) - 1.0f);
 			object.getTransform().setYPos((3 * rand.nextFloat()) - 1.0f);
 			scene.addObject(object);
 		}
+		
+		collisionHandler.narrowScan(scene.objects.toArray(new GameObject[0]));
 	}
 	
 	public void run() {
@@ -206,7 +208,6 @@ public class Game implements KeyListener {
 	public void destroy() {
 		window.destroy();
 		console.destroy();
-		testObject.destroy();
 	}
 
 	@Override

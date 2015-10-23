@@ -12,7 +12,9 @@ import engine.object.GameObject;
 public class Scene {
 
 	private RenderEngine renderer;
-	private ArrayList<GameObject> objects;
+	
+	// TODO PUBLIC FOR TESTING ONLY
+	public ArrayList<GameObject> objects;
 	
 	private HashMap<InstancedMesh, MeshBatch> batches;
 	

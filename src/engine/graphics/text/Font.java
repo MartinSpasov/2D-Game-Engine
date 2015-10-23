@@ -1,4 +1,6 @@
-package engine.graphics;
+package engine.graphics.text;
+
+import engine.graphics.Texture;
 
 public class Font {
 
