@@ -24,8 +24,10 @@ public class Scene {
 		batches = new HashMap<InstancedMesh, MeshBatch>();
 	}
 	
-	public void tick() {
-		
+	public void tick(float delta) {
+		for (GameObject object : objects) {
+			object.tick(delta);
+		}
 	}
 	
 	public void render() {
@@ -52,5 +54,11 @@ public class Scene {
 	
 	public void addObject(GameObject object) {
 		objects.add(object);
+	}
+	
+	public void destroy() {
+		for (GameObject object : objects) {
+			object.destroy();
+		}
 	}
 }

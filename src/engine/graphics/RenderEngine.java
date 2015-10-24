@@ -77,4 +77,8 @@ public class RenderEngine {
 		
 	}
 	
+	public void destroy() {
+		instanceShaderProgram.destroy();
+	}
+	
 }

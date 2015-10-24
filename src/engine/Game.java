@@ -49,6 +49,7 @@ public class Game implements KeyListener {
 	private boolean d;
 	private boolean q;
 	private boolean e;
+	private boolean space;
 	
 	public static final float SPEED = 3f;
 	
@@ -134,7 +135,7 @@ public class Game implements KeyListener {
 		Random rand = new Random();
 		
 		for (int i = 1; i <= 100; i++) {
-			GameObject object = new GameObject(new Transform(), mesh, texture, new Rectangle(1.0f,1.0f));
+			GameObject object = new GameObject(new Transform(), mesh, texture, new Rectangle(1.0f,1.0f), 80.7f);
 			object.getTransform().setZPos(-1 * i);
 			object.getTransform().setXPos((3 * rand.nextFloat()) - 1.0f);
 			object.getTransform().setYPos((3 * rand.nextFloat()) - 1.0f);
@@ -197,7 +198,12 @@ public class Game implements KeyListener {
 			//testObject.getTransform().setZRot(testObject.getTransform().getZRot() - (SPEED * delta));
 			testCam.getTransform().setZRot(testCam.getTransform().getZRot() - (SPEED * delta));
 		}
-		scene.tick();
+		if (space) {
+			for (GameObject object : scene.objects) {
+				object.getRigidBody().applyTorque(20);
+			}
+		}
+		scene.tick(delta);
 	}
 	
 	public void render() {
@@ -206,8 +212,10 @@ public class Game implements KeyListener {
 	}
 	
 	public void destroy() {
-		window.destroy();
 		console.destroy();
+		renderer.destroy();
+		scene.destroy();
+		window.destroy();
 	}
 
 	@Override
@@ -261,6 +269,15 @@ public class Game implements KeyListener {
 			}
 			else if (action == GLFW.GLFW_RELEASE) {
 				e = false;
+			}
+		}
+		
+		if (key == GLFW.GLFW_KEY_SPACE) {
+			if (action == GLFW.GLFW_PRESS) {
+				space = true;
+			}
+			else if (action == GLFW.GLFW_RELEASE) {
+				space = false;
 			}
 		}
 	}

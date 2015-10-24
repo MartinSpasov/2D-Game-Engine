@@ -3,6 +3,7 @@ package engine.object;
 import engine.graphics.Mesh;
 import engine.graphics.Texture;
 import engine.object.component.ColliderComponent;
+import engine.object.component.RigidBodyComponent;
 import engine.physics.geometry.Shape;
 
 public class GameObject {
@@ -13,12 +14,19 @@ public class GameObject {
 	private Texture texture;
 	
 	private ColliderComponent collider;
+	private RigidBodyComponent rigidBody;
 	
-	public GameObject(Transform transform, Mesh mesh, Texture texture, Shape shape) {
+	public GameObject(Transform transform, Mesh mesh, Texture texture, Shape shape, float mass) {
 		this.transform = transform;
 		this.mesh = mesh;
 		this.texture = texture;
-		this.collider = new ColliderComponent(this, shape);
+		collider = new ColliderComponent(this, shape);
+		rigidBody = new RigidBodyComponent(this, mass);
+	}
+	
+	public void tick(float delta) {
+		rigidBody.tick(delta);
+		collider.tick(delta);
 	}
 	
 	public void destroy() {
@@ -40,5 +48,9 @@ public class GameObject {
 	
 	public ColliderComponent getCollider() {
 		return collider;
+	}
+	
+	public RigidBodyComponent getRigidBody() {
+		return rigidBody;
 	}
 }
