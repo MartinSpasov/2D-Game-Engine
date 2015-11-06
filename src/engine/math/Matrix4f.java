@@ -229,4 +229,64 @@ public class Matrix4f {
 			return false;
 		}
 	}
+
+	public static Matrix4f perspective(float l, float r, float t, float b, float n, float f) {
+		// FIXME Something is not correct with this matrix
+		return new Matrix4f(new float[]{
+				(2 * n) / (r - l),0,(r + l) / (r - l),0,
+				0,(2 * n) / (t - b),(t + b) / (t - b),0,
+				0,0,(-1 * (f + n))/(f - n),(-2 * f * n)/(f - n),
+				0,0,-1,0
+		});
+	}
+	
+	public static Matrix4f orthographic(float l, float r, float t, float b, float n, float f) {
+		
+		return new Matrix4f(new float[]{
+				1 / r, 0, 0, 0,
+				0, 1 / t, 0, 0,
+				0, 0, -2/(f - n),-1 * ((f + n)/(f - n)),
+				0,0,0,1	
+		});
+	}
+	
+	public static Matrix4f translation(float dx, float dy, float dz) {
+		return new Matrix4f(new float[]{
+				1,0,0,dx,
+				0,1,0,dy,
+				0,0,1,dz,
+				0,0,0,1});
+	}
+	
+	public static Matrix4f scale(float sx, float sy, float sz) {
+		return new Matrix4f(new float[]{
+				sx,0,0,0,
+				0,sy,0,0,
+				0,0,sz,0,
+				0,0,0,1});
+	}
+	
+	public static Matrix4f rotationX(float angle) {
+		return new Matrix4f(new float[] {
+				1,0,0,0,
+				0,(float) Math.cos(angle),(float)(-1 * Math.sin(angle)),0,
+				0,(float) Math.sin(angle),(float) Math.cos(angle),0,
+				0,0,0,1});
+	}
+	
+	public static Matrix4f rotationY(float angle) {
+		return new Matrix4f(new float[] {
+				(float) Math.cos(angle),0,(float) (-1 * Math.sin(angle)),0,
+				0,1,0,0,
+				(float) Math.sin(angle),0,(float) Math.cos(angle),0,
+				0,0,0,1});
+	}
+	
+	public static Matrix4f rotationZ(float angle) {
+		return new Matrix4f(new float[] {
+				(float) Math.cos(angle),(float) (-1 * Math.sin(angle)),0,0,
+				(float) Math.sin(angle),(float) Math.cos(angle),0,0,
+				0,0,1,0,
+				0,0,0,1});
+	}
 }

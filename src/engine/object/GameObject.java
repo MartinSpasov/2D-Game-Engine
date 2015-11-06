@@ -16,6 +16,7 @@ public class GameObject {
 	private ColliderComponent collider;
 	private RigidBodyComponent rigidBody;
 	
+	
 	public GameObject(Transform transform, Mesh mesh, Texture texture, Shape shape, float mass) {
 		this.transform = transform;
 		this.mesh = mesh;

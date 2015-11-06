@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import org.lwjgl.opengl.GL15;
 
 import engine.math.Matrix4f;
-import engine.object.GameObject;
 
 public class MeshBatch {
 
@@ -21,18 +20,10 @@ public class MeshBatch {
 		modelMatrices = new ArrayList<Matrix4f>();
 	}
 	
-	public MeshBatch(GameObject[] objects, InstancedMesh mesh, Texture texture) {
-		this(mesh, texture);
-		
-		for (int i = 0; i < objects.length; i++) {
-			addToBatch(objects[i]);
-		}
-	}
-	
-	public void addToBatch(GameObject object) {
+	public void addToBatch(Matrix4f mat) {
 		// TODO Handle object with wrong mesh
 		
-		modelMatrices.add(object.getTransform().toMatrix());
+		modelMatrices.add(mat);
 		
 	}
 	

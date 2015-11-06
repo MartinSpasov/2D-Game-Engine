@@ -46,32 +46,20 @@ public class Transform {
 		zPos += dz;
 	}
 	
+	public void scale(float scale) {
+		xScale *= scale;
+		yScale *= scale;
+		zScale *= scale;
+	}
+	
 	public Matrix4f toMatrix() {
 		// TODO pre multiply???
-		Matrix4f scalePos = new Matrix4f(new float[]{
-				xScale,0,0,xPos,
-				0,yScale,0,yPos,
-				0,0,zScale,zPos,
-				0,0,0,1});
 		
-		Matrix4f xRotMatrix = new Matrix4f(new float[] {
-			1,0,0,0,
-			0,(float) Math.cos(xRot),(float)(-1 * Math.sin(xRot)),0,
-			0,(float) Math.sin(xRot),(float) Math.cos(xRot),0,
-			0,0,0,1
-		});
-		Matrix4f yRotMatrix = new Matrix4f(new float[] {
-				(float) Math.cos(yRot),0,(float) (-1 * Math.sin(yRot)),0,
-				0,1,0,0,
-				(float) Math.sin(yRot),0,(float) Math.cos(yRot),0,
-				0,0,0,1
-			});
-		Matrix4f zRotMatrix = new Matrix4f(new float[] {
-				(float) Math.cos(zRot),(float) (-1 * Math.sin(zRot)),0,0,
-				(float) Math.sin(zRot),(float) Math.cos(zRot),0,0,
-				0,0,1,0,
-				0,0,0,1
-			});
+		Matrix4f scalePos = Matrix4f.translation(xPos, yPos, zPos).multiply(Matrix4f.scale(xScale, yScale, zScale));
+		Matrix4f xRotMatrix = Matrix4f.rotationX(xRot);
+		Matrix4f yRotMatrix = Matrix4f.rotationY(yRot);
+		Matrix4f zRotMatrix = Matrix4f.rotationZ(zRot);
+		
 		return scalePos.multiply(xRotMatrix).multiply(zRotMatrix).multiply(yRotMatrix);
 	}
 

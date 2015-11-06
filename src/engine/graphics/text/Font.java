@@ -1,29 +1,37 @@
 package engine.graphics.text;
 
-import engine.graphics.Texture;
+import java.util.HashMap;
+
+import engine.graphics.ArrayTexture;
 
 public class Font {
 
-	private Texture glyphs;
+	private ArrayTexture glyphs;
+	private HashMap<Character, Integer> characterMap;
+	private int defaultCharacter;
 	
-	private int rows;
-	private int columns;
-	
-	public Font(Texture glyphs, int rows, int columns) {
+	public Font(ArrayTexture glyphs, int defaultCharacter) {
 		this.glyphs = glyphs;
-		this.rows = rows;
-		this.columns = columns;
+		this.defaultCharacter = defaultCharacter;
+		characterMap = new HashMap<Character, Integer>();
 	}
 	
-	public Texture getGlyphs() {
+	public ArrayTexture getGlyphs() {
 		return glyphs;
 	}
 	
-	public int getRows() {
-		return rows;
+	public void addCharacterMapping(char c, int i) {
+		characterMap.put(c, i);
 	}
 	
-	public int getColumns() {
-		return columns;
+	public int getCharacterMapping(char c) {
+		Integer i = characterMap.get(c);
+		
+		if (i == null) {
+			return defaultCharacter;
+		}
+		else {
+			return i;
+		}
 	}
 }

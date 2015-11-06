@@ -25,4 +25,27 @@ public class Logger {
 		output.println(format.format(date) + " " + message);
 	}
 	
+	public void log(int i) {
+		log(String.valueOf(i));
+	}
+	
+	public void log(long l) {
+		log(String.valueOf(l));
+	}
+	
+	public void log(float f) {
+		log(String.valueOf(f));
+	}
+	
+	public void log(double d) {
+		log(String.valueOf(d));
+	}
+	
+	public void log(char c) {
+		log(String.valueOf(c));
+	}
+	
+	public void log(boolean b) {
+		log(String.valueOf(b));
+	}
 }

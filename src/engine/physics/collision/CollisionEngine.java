@@ -22,7 +22,7 @@ public class CollisionEngine {
 				}
 			}
 		}
-		System.out.println(pairs.size());
+		//System.out.println(pairs.size());
 	}
 	
 }
