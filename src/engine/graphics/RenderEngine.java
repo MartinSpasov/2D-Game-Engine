@@ -36,9 +36,9 @@ public class RenderEngine {
 		instanceShaderProgram = new ShaderProgram(Resources.loadText("instance_vert.shader"), Resources.loadText("instance_frag.shader"), new String[]{"diffuseTexture"});
 		textShaderProgram = new ShaderProgram(Resources.loadText("text_vert.shader"), Resources.loadText("text_frag.shader"), new String[]{"modelMatrix","letter","diffuseTexture"});
 		spriteShaderProgram = new ShaderProgram(Resources.loadText("instance_vert.shader"), Resources.loadText("sprite_frag.shader"), new String[]{"diffuseTextureAtlas", "currentFrame"});
-		//System.out.println(GL11.glGetString(GL11.GL_VERSION));
+		
 		GL11.glClearColor(0.0f, 51/255.0f, 153/255.0f, 1.0f);
-		//GL11.glEnable(GL11.GL_DEPTH_TEST);
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		//GL11.glEnable(GL11.GL_BLEND);
 		//GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		
@@ -71,6 +71,7 @@ public class RenderEngine {
 		
 		GL30.glBindVertexArray(batch.getMesh().getVaoId());
 		
+		
 		batch.loadBatch(camera);
 		
 		// Diffuse Texture
@@ -89,6 +90,7 @@ public class RenderEngine {
 		
 		GL30.glBindVertexArray(batch.getMesh().getVaoId());
 		
+		
 		batch.loadBatch(camera);
 		
 		// Diffuse Texture
@@ -99,7 +101,7 @@ public class RenderEngine {
 		
 		//GL20.glEnableVertexAttribArray(0);
 		GL31.glDrawArraysInstanced(GL11.GL_TRIANGLES, 0, batch.getMesh().getNumVertices(), batch.size());
-		
+		batch.clear();  // TODO Figure out why this only works here
 	}
 	
 	public void renderText(String text, Font font, float x, float y) {
@@ -171,6 +173,8 @@ public class RenderEngine {
 	}
 	
 	public void destroy() {
+		GL20.glUseProgram(0);
+		
 		instanceShaderProgram.destroy();
 		defaultShaderProgram.destroy();
 		textShaderProgram.destroy();

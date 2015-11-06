@@ -3,21 +3,47 @@ package engine.graphics;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
+import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.GL33;
 
 import engine.math.Matrix4f;
 
 public class MeshBatch {
 
-	private InstancedMesh mesh;
+	private Mesh mesh;
 	private Texture texture;
+	
+	private int maxSize;
+	
+	private int mvpMatrixBufferId;
 	
 	private ArrayList<Matrix4f> modelMatrices;
 	
-	public MeshBatch(InstancedMesh mesh, Texture texture) {
+	public MeshBatch(Mesh mesh, Texture texture, int maxSize) {
 		this.mesh = mesh;
 		this.texture = texture;
+		this.maxSize = maxSize;
+		
 		modelMatrices = new ArrayList<Matrix4f>();
+		
+		GL30.glBindVertexArray(mesh.getVaoId());
+		
+		mvpMatrixBufferId = GL15.glGenBuffers();
+		
+		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, mvpMatrixBufferId);
+		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, maxSize * 4 * 16, GL15.GL_DYNAMIC_DRAW);
+		
+		for (int i = 0; i < 4; i++) {
+			GL20.glVertexAttribPointer(2 + i, 4, GL11.GL_FLOAT, false, 64, 16 * i);
+			GL20.glEnableVertexAttribArray(2 + i);
+			GL33.glVertexAttribDivisor(2 + i, 1);
+		}
+		
+		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+		GL30.glBindVertexArray(0);
 	}
 	
 	public void addToBatch(Matrix4f mat) {
@@ -28,9 +54,8 @@ public class MeshBatch {
 	}
 	
 	public void loadBatch(Camera camera) {
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, mesh.getMvpMatrixBufferId());
+		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, mvpMatrixBufferId);
 		FloatBuffer buffer = GL15.glMapBuffer(GL15.GL_ARRAY_BUFFER, GL15.GL_WRITE_ONLY).asFloatBuffer();
-		
 		Matrix4f pvMatrix = camera.getProjectionMatrix().multiply(camera.getWorldMatrix());
 		
 		for (int i = 0; i < modelMatrices.size(); i++) {
@@ -56,10 +81,10 @@ public class MeshBatch {
 		
 		GL15.glUnmapBuffer(GL15.GL_ARRAY_BUFFER);
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-		
+		//modelMatrices.clear();
 	}
 	
-	public InstancedMesh getMesh() {
+	public Mesh getMesh() {
 		return mesh;
 	}
 	
@@ -67,7 +92,19 @@ public class MeshBatch {
 		return texture;
 	}
 	
+	public int getMaxSize() {
+		return maxSize;
+	}
+	
 	public int size() {
 		return modelMatrices.size();
+	}
+	
+	public void clear() {
+		modelMatrices.clear();
+	}
+	
+	public void destroy() {
+		GL15.glDeleteBuffers(mvpMatrixBufferId);
 	}
 }

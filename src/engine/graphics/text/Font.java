@@ -34,4 +34,8 @@ public class Font {
 			return i;
 		}
 	}
+	
+	public void destroy() {
+		glyphs.destroy();
+	}
 }

@@ -11,7 +11,8 @@ import engine.console.Console;
 import engine.console.Logger;
 import engine.graphics.ArrayTexture;
 import engine.graphics.Camera;
-import engine.graphics.InstancedMesh;
+import engine.graphics.Mesh;
+import engine.graphics.MeshBatch;
 import engine.graphics.RenderEngine;
 import engine.graphics.Texture;
 import engine.graphics.animation.Animation;
@@ -61,7 +62,7 @@ public class Game implements KeyListener {
 	public static final int MAX_INSTANCE_COUNT = 10000;
 	//private double counter;
 	
-	public static InstancedMesh mesh;
+	public static Mesh mesh;
 	
 	private Font font;
 	
@@ -77,8 +78,8 @@ public class Game implements KeyListener {
 		window = new Window(500,500, "Test");
 		anim = new Animation(new int[]{0,1,2}, new float[]{0.15f,0.15f,0.15f});
 		
-		testCam = new Camera(Matrix4f.orthographic(-1, 1, 1, -1, NEAR_PLANE, FAR_PLANE));
-		//testCam = new Camera(Matrix4f.perspective(-1, 1, 1, -1, NEAR_PLANE, FAR_PLANE));
+		//testCam = new Camera(Matrix4f.orthographic(-1, 1, 1, -1, NEAR_PLANE, FAR_PLANE));
+		testCam = new Camera(Matrix4f.perspective(-1, 1, 1, -1, NEAR_PLANE, FAR_PLANE));
 		
 		renderer = new RenderEngine(testCam);
 		logger.log(renderer.getOpenGLVersion());
@@ -90,7 +91,7 @@ public class Game implements KeyListener {
 		scene = new Scene(renderer);
 		collisionHandler = new CollisionEngine();
 		
-		mesh = new InstancedMesh(toBuffer(RenderEngine.PLANE_VERTS), toBuffer(RenderEngine.PLANE_UV), MAX_INSTANCE_COUNT);
+		mesh = new Mesh(toBuffer(RenderEngine.PLANE_VERTS), toBuffer(RenderEngine.PLANE_UV));
 		
 		
 		// Texture
@@ -108,7 +109,7 @@ public class Game implements KeyListener {
 			object.getTransform().setYPos((3 * rand.nextFloat()) - 1.0f);
 			scene.addObject(object);
 		}
-		
+		scene.addMeshBatch(new MeshBatch(mesh, texture, 100));
 		//Resources.loadArrayTexture("megaman_sheet.png", 1, 3);
 		
 		font = new Font(Resources.loadArrayTexture("samplefont.png", 14, 16), 0);
@@ -289,6 +290,8 @@ public class Game implements KeyListener {
 		renderer.destroy();
 		scene.destroy();
 		obj.destroy();
+		tex.destroy();
+		font.destroy();
 		window.destroy();
 	}
 
