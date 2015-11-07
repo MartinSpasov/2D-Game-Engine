@@ -1,33 +1,35 @@
 package engine.object;
 
+import java.util.ArrayList;
+
 import engine.graphics.Mesh;
 import engine.graphics.Texture;
-import engine.object.component.ColliderComponent;
-import engine.object.component.RigidBodyComponent;
-import engine.physics.geometry.Shape;
+import engine.object.component.ObjectComponent;
 
 public class GameObject {
 
 	private Transform transform;
 	
+	private ArrayList<ObjectComponent> components;
+	
 	private Mesh mesh;
-	private Texture texture;
+	private Texture texture;	
 	
-	private ColliderComponent collider;
-	private RigidBodyComponent rigidBody;
-	
-	
-	public GameObject(Transform transform, Mesh mesh, Texture texture, Shape shape, float mass) {
+	public GameObject(Transform transform, Mesh mesh, Texture texture) {
 		this.transform = transform;
 		this.mesh = mesh;
 		this.texture = texture;
-		collider = new ColliderComponent(this, shape);
-		rigidBody = new RigidBodyComponent(this, mass);
+		components = new ArrayList<ObjectComponent>();
 	}
 	
 	public void tick(float delta) {
-		rigidBody.tick(delta);
-		collider.tick(delta);
+		for (ObjectComponent component : components) {
+			component.tick(delta);
+		}
+	}
+	
+	public void addComponent(ObjectComponent component) {
+		components.add(component);
 	}
 	
 	public void destroy() {
@@ -47,11 +49,4 @@ public class GameObject {
 		return texture;
 	}
 	
-	public ColliderComponent getCollider() {
-		return collider;
-	}
-	
-	public RigidBodyComponent getRigidBody() {
-		return rigidBody;
-	}
 }

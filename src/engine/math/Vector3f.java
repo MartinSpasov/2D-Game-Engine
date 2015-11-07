@@ -10,6 +10,10 @@ public class Vector3f {
 		this(0,0,0);
 	}
 	
+	public Vector3f(Vector3f vector) {
+		this(vector.x, vector.y, vector.z);
+	}
+	
 	public Vector3f(float x, float y, float z) {
 		this.x = x;
 		this.y = y;

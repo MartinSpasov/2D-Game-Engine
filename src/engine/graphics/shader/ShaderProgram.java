@@ -1,8 +1,10 @@
 package engine.graphics.shader;
 
+import java.nio.IntBuffer;
+
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
-
 import engine.Game;
 
 public class ShaderProgram {
@@ -11,7 +13,7 @@ public class ShaderProgram {
 	
 	private Uniform[] uniforms;
 	
-	public ShaderProgram(String vertSrc, String fragSrc, String[] uniforms) {
+	public ShaderProgram(String vertSrc, String fragSrc) {
 		// TODO handle shader compilation error
 		int vertShaderId = GL20.glCreateShader(GL20.GL_VERTEX_SHADER);
 		GL20.glShaderSource(vertShaderId, vertSrc);
@@ -41,10 +43,17 @@ public class ShaderProgram {
 			Game.logger.log("Failed to link program: " + GL20.glGetProgramInfoLog(programId));
 		}
 		
+		IntBuffer countBuffer = BufferUtils.createIntBuffer(1);
+		GL20.glGetProgramiv(programId, GL20.GL_ACTIVE_UNIFORMS, countBuffer);
+		int count = countBuffer.get(0);
 		
-		this.uniforms = new Uniform[uniforms.length];
-		for (int i = 0; i < uniforms.length; i++) {
-			this.uniforms[i] = new Uniform(uniforms[i], this);
+		uniforms = new Uniform[count];
+		for (int i = 0; i < count; i++) {
+			IntBuffer size = BufferUtils.createIntBuffer(1);
+			IntBuffer type = BufferUtils.createIntBuffer(1);
+			String name = GL20.glGetActiveUniform(programId, i, size, type);
+			int location = GL20.glGetUniformLocation(programId, name);
+			uniforms[i] = new Uniform(name, location, size.get(0), type.get(0));
 		}
 		
 		// Clean up.

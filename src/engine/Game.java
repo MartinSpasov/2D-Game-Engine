@@ -23,7 +23,6 @@ import engine.math.Matrix4f;
 import engine.object.GameObject;
 import engine.object.Transform;
 import engine.physics.collision.CollisionEngine;
-import engine.physics.geometry.Rectangle;
 import engine.resource.Resources;
 
 public class Game implements KeyListener {
@@ -103,7 +102,7 @@ public class Game implements KeyListener {
 		Random rand = new Random();
 		
 		for (int i = 1; i <= 100; i++) {
-			GameObject object = new GameObject(new Transform(), mesh, texture, new Rectangle(1.0f,1.0f), 80.7f);
+			GameObject object = new GameObject(new Transform(), mesh, texture);
 			object.getTransform().setZPos(-1 * i);
 			object.getTransform().setXPos((3 * rand.nextFloat()) - 1.0f);
 			object.getTransform().setYPos((3 * rand.nextFloat()) - 1.0f);
@@ -210,7 +209,7 @@ public class Game implements KeyListener {
 		font.addCharacterMapping('~', 94);
 		
 		//collisionHandler.narrowScan(scene.objects.toArray(new GameObject[0]));
-		obj = new GameObject(new Transform(0,0,-2), mesh, Resources.loadTexture("megaman2.png"), new Rectangle(0,0), 1000);
+		obj = new GameObject(new Transform(0,0,-2), mesh, Resources.loadTexture("megaman2.png"));
 	}
 	
 	public void run() {
@@ -219,13 +218,23 @@ public class Game implements KeyListener {
 		double delta = 0;
 		double currentTime = 0;
 		
+		double t1 = 0;
+		double t2 = 0;
+		
 		logger.log("Entering loop.");
 		
 		while (GLFW.glfwWindowShouldClose(window.getId()) == GL11.GL_FALSE) {
 			currentTime = GLFW.glfwGetTime();
 			GLFW.glfwPollEvents();
+			
+			t1 = GLFW.glfwGetTime();
 			tick((float)delta);
+			logger.log("TICK: " + ((GLFW.glfwGetTime() - t1) * 1000) + " ms");
+			
+			t2 = GLFW.glfwGetTime();
 			render();
+			logger.log("RENDER: " + ((GLFW.glfwGetTime() - t2) * 1000) + " ms");
+			
 			window.swapBuffers();
 			delta = GLFW.glfwGetTime() - currentTime;
 			
@@ -268,10 +277,10 @@ public class Game implements KeyListener {
 			testCam.getTransform().setZRot(testCam.getTransform().getZRot() - (SPEED * delta));
 		}
 		if (space) {
-			for (GameObject object : scene.objects) {
-				object.getRigidBody().applyTorque(20);
-			}
-			obj.getRigidBody().applyTorque(20);
+//			for (GameObject object : scene.objects) {
+//				object.getRigidBody().applyTorque(20);
+//			}
+//			obj.getRigidBody().applyTorque(20);
 		}
 		scene.tick(delta);
 		obj.tick(delta);

@@ -12,8 +12,7 @@ public class Scene {
 
 	private RenderEngine renderer;
 	
-	// TODO PUBLIC FOR TESTING ONLY
-	public ArrayList<GameObject> objects;
+	private ArrayList<GameObject> objects;
 	
 	private HashMap<Mesh, MeshBatch> batches;
 	
@@ -31,17 +30,6 @@ public class Scene {
 	
 	public void render() {
 		for (GameObject object : objects) {
-			// Should move all this render stuff to RenderEngine
-//			if (object.getMesh() instanceof InstancedMesh) {
-//				MeshBatch batch = batches.get(object.getMesh());
-//			
-//				if (batch == null) {
-//					batch = new MeshBatch((InstancedMesh)object.getMesh(), object.getTexture());
-//					batches.put((InstancedMesh)object.getMesh(), batch);
-//				}
-//			
-//				batch.addToBatch(object.getTransform().toMatrix());
-//			}
 			// Update batches
 			MeshBatch batch = batches.get(object.getMesh());
 			
@@ -55,10 +43,8 @@ public class Scene {
 		
 		for (Mesh mesh : batches.keySet()) {
 			renderer.render(batches.get(mesh), Game.anim, Game.tex);
-			//batches.clear();
 		}
 		
-		//batches.clear();
 	}
 	
 	public void addObject(GameObject object) {

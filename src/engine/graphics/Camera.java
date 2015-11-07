@@ -9,6 +9,10 @@ public class Camera {
 	
 	private Matrix4f projectionMatrix;
 	
+	public Camera(Camera camera) {
+		this(camera.getTransform(), camera.getProjectionMatrix());
+	}
+	
 	public Camera(Matrix4f projectionMatrix) {
 		this(new Transform(), projectionMatrix);
 	}

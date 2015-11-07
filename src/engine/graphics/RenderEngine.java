@@ -32,10 +32,10 @@ public class RenderEngine {
 	
 	public RenderEngine(Camera camera) {
 		this.camera = camera;
-		defaultShaderProgram = new ShaderProgram(Resources.loadText("default_vert.shader"), Resources.loadText("default_frag.shader"), new String[]{"mvpMatrix", "diffuseTexture"});
-		instanceShaderProgram = new ShaderProgram(Resources.loadText("instance_vert.shader"), Resources.loadText("instance_frag.shader"), new String[]{"diffuseTexture"});
-		textShaderProgram = new ShaderProgram(Resources.loadText("text_vert.shader"), Resources.loadText("text_frag.shader"), new String[]{"modelMatrix","letter","diffuseTexture"});
-		spriteShaderProgram = new ShaderProgram(Resources.loadText("instance_vert.shader"), Resources.loadText("sprite_frag.shader"), new String[]{"diffuseTextureAtlas", "currentFrame"});
+		defaultShaderProgram = new ShaderProgram(Resources.loadText("default_vert.shader"), Resources.loadText("default_frag.shader"));
+		instanceShaderProgram = new ShaderProgram(Resources.loadText("instance_vert.shader"), Resources.loadText("instance_frag.shader"));
+		textShaderProgram = new ShaderProgram(Resources.loadText("text_vert.shader"), Resources.loadText("text_frag.shader"));
+		spriteShaderProgram = new ShaderProgram(Resources.loadText("instance_vert.shader"), Resources.loadText("sprite_frag.shader"));
 		
 		GL11.glClearColor(0.0f, 51/255.0f, 153/255.0f, 1.0f);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
@@ -120,8 +120,8 @@ public class RenderEngine {
 			transform.setZScale(size);
 			Uniform[] uniforms = textShaderProgram.getUniforms();
 			GL20.glUniformMatrix4fv(uniforms[0].getLocation(), false, transform.toMatrix().toBuffer());
-			GL20.glUniform1i(uniforms[1].getLocation(), font.getCharacterMapping(text.charAt(i)));
-			GL20.glUniform1i(uniforms[2].getLocation(), 0);
+			GL20.glUniform1i(uniforms[2].getLocation(), font.getCharacterMapping(text.charAt(i)));
+			GL20.glUniform1i(uniforms[1].getLocation(), 0);
 			GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, Game.mesh.getNumVertices());
 		}
 		

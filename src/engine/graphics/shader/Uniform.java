@@ -1,15 +1,18 @@
 package engine.graphics.shader;
 
-import org.lwjgl.opengl.GL20;
-
 public class Uniform {
 	
 	private String name;
-	private int location;
 	
-	public Uniform(String name, ShaderProgram program) {
+	private int location;
+	private int size;
+	private int type;
+	
+	public Uniform(String name, int location, int size, int type) {
 		this.name = name;
-		location = GL20.glGetUniformLocation(program.getProgramId(), name);
+		this.location = location;
+		this.size = size;
+		this.type = type;
 	}
 	
 	public String getName() {
@@ -18,5 +21,13 @@ public class Uniform {
 	
 	public int getLocation() {
 		return location;
+	}
+	
+	public int getSize() {
+		return size;
+	}
+	
+	public int getType() {
+		return type;
 	}
 }
