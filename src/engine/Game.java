@@ -22,6 +22,10 @@ import engine.input.KeyListener;
 import engine.math.Matrix4f;
 import engine.object.GameObject;
 import engine.object.Transform;
+import engine.object.component.AnimatorComponent;
+import engine.object.component.PlatformerController2D;
+import engine.object.component.RigidBodyComponent;
+import engine.object.component.StateComponent;
 import engine.physics.collision.CollisionEngine;
 import engine.resource.Resources;
 
@@ -40,8 +44,9 @@ public class Game implements KeyListener {
 	
 	private GameObject obj;
 	
-	public static Animation anim;
 	public static ArrayTexture tex;
+	public static AnimatorComponent animComp;
+	private StateComponent stateComp;
 	
 	public static final float NEAR_PLANE = 1f;
 	public static final float FAR_PLANE = 1000f;
@@ -52,7 +57,6 @@ public class Game implements KeyListener {
 	private boolean d;
 	private boolean q;
 	private boolean e;
-	private boolean space;
 	
 	private int fps;
 	
@@ -75,7 +79,6 @@ public class Game implements KeyListener {
 		logger = new Logger(System.out);
 		logger.log("Initializing subsystems.");
 		window = new Window(500,500, "Test");
-		anim = new Animation(new int[]{0,1,2}, new float[]{0.15f,0.15f,0.15f});
 		
 		//testCam = new Camera(Matrix4f.orthographic(-1, 1, 1, -1, NEAR_PLANE, FAR_PLANE));
 		testCam = new Camera(Matrix4f.perspective(-1, 1, 1, -1, NEAR_PLANE, FAR_PLANE));
@@ -101,14 +104,26 @@ public class Game implements KeyListener {
 
 		Random rand = new Random();
 		
-		for (int i = 1; i <= 100; i++) {
-			GameObject object = new GameObject(new Transform(), mesh, texture);
-			object.getTransform().setZPos(-1 * i);
-			object.getTransform().setXPos((3 * rand.nextFloat()) - 1.0f);
-			object.getTransform().setYPos((3 * rand.nextFloat()) - 1.0f);
-			scene.addObject(object);
-		}
-		scene.addMeshBatch(new MeshBatch(mesh, texture, 100));
+		//stateComp = new StateComponent(obj,);
+		
+		obj = new GameObject(mesh, texture);
+		
+		Animation animWalk = new Animation(new int[]{0,1,2}, new float[]{0.15f,0.15f,0.15f});
+		Animation animIdle = new Animation(new int[]{0}, new float[]{0});
+		
+		stateComp = new StateComponent(obj, "IDLE");
+		animComp = new AnimatorComponent(obj, "IDLE", animIdle);
+		
+		animComp.addAnimation("MOVING", animWalk);
+		stateComp.registerListener(animComp);
+		
+		obj.addComponent(stateComp);
+		obj.addComponent(animComp);
+		
+		PlatformerController2D controller = new PlatformerController2D(obj, stateComp);
+		obj.addComponent(controller);
+		input.addKeyListener(controller);
+		
 		//Resources.loadArrayTexture("megaman_sheet.png", 1, 3);
 		
 		font = new Font(Resources.loadArrayTexture("samplefont.png", 14, 16), 0);
@@ -207,9 +222,6 @@ public class Game implements KeyListener {
 		font.addCharacterMapping('|', 92);
 		font.addCharacterMapping('}', 93);
 		font.addCharacterMapping('~', 94);
-		
-		//collisionHandler.narrowScan(scene.objects.toArray(new GameObject[0]));
-		obj = new GameObject(new Transform(0,0,-2), mesh, Resources.loadTexture("megaman2.png"));
 	}
 	
 	public void run() {
@@ -218,8 +230,8 @@ public class Game implements KeyListener {
 		double delta = 0;
 		double currentTime = 0;
 		
-		double t1 = 0;
-		double t2 = 0;
+		//double t1 = 0;
+		//double t2 = 0;
 		
 		logger.log("Entering loop.");
 		
@@ -227,13 +239,13 @@ public class Game implements KeyListener {
 			currentTime = GLFW.glfwGetTime();
 			GLFW.glfwPollEvents();
 			
-			t1 = GLFW.glfwGetTime();
+			//t1 = GLFW.glfwGetTime();
 			tick((float)delta);
-			logger.log("TICK: " + ((GLFW.glfwGetTime() - t1) * 1000) + " ms");
+			//logger.log("TICK: " + ((GLFW.glfwGetTime() - t1) * 1000) + " ms");
 			
-			t2 = GLFW.glfwGetTime();
+			//t2 = GLFW.glfwGetTime();
 			render();
-			logger.log("RENDER: " + ((GLFW.glfwGetTime() - t2) * 1000) + " ms");
+			//logger.log("RENDER: " + ((GLFW.glfwGetTime() - t2) * 1000) + " ms");
 			
 			window.swapBuffers();
 			delta = GLFW.glfwGetTime() - currentTime;
@@ -251,7 +263,6 @@ public class Game implements KeyListener {
 	}
 	
 	public void tick(float delta) {
-		anim.tick(delta);
 		if (w) {
 			//testObject.getTransform().translate(0, SPEED * delta, 0);
 			testCam.getTransform().translate(0, 0, -SPEED * delta);
@@ -276,12 +287,6 @@ public class Game implements KeyListener {
 			//testObject.getTransform().setZRot(testObject.getTransform().getZRot() - (SPEED * delta));
 			testCam.getTransform().setZRot(testCam.getTransform().getZRot() - (SPEED * delta));
 		}
-		if (space) {
-//			for (GameObject object : scene.objects) {
-//				object.getRigidBody().applyTorque(20);
-//			}
-//			obj.getRigidBody().applyTorque(20);
-		}
 		scene.tick(delta);
 		obj.tick(delta);
 	}
@@ -289,7 +294,7 @@ public class Game implements KeyListener {
 	public void render() {
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 		scene.render();
-		renderer.render(obj);
+		renderer.render(obj, animComp.getCurrentFrame(), tex);
 		renderer.renderText("FPS: " + fps, font, -0.5f, -0.5f);
 		renderer.checkError(logger);
 	}
@@ -357,15 +362,7 @@ public class Game implements KeyListener {
 				e = false;
 			}
 		}
-		
-		if (key == GLFW.GLFW_KEY_SPACE) {
-			if (action == GLFW.GLFW_PRESS) {
-				space = true;
-			}
-			else if (action == GLFW.GLFW_RELEASE) {
-				space = false;
-			}
-		}
+
 	}
 	
 	// TODO remove later

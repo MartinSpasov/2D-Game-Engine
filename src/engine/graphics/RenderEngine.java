@@ -35,7 +35,7 @@ public class RenderEngine {
 		defaultShaderProgram = new ShaderProgram(Resources.loadText("default_vert.shader"), Resources.loadText("default_frag.shader"));
 		instanceShaderProgram = new ShaderProgram(Resources.loadText("instance_vert.shader"), Resources.loadText("instance_frag.shader"));
 		textShaderProgram = new ShaderProgram(Resources.loadText("text_vert.shader"), Resources.loadText("text_frag.shader"));
-		spriteShaderProgram = new ShaderProgram(Resources.loadText("instance_vert.shader"), Resources.loadText("sprite_frag.shader"));
+		spriteShaderProgram = new ShaderProgram(Resources.loadText("default_vert.shader"), Resources.loadText("sprite_frag.shader"));
 		
 		GL11.glClearColor(0.0f, 51/255.0f, 153/255.0f, 1.0f);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
@@ -85,7 +85,7 @@ public class RenderEngine {
 	}
 	
 	// TODO remove this method
-	public void render(MeshBatch batch, Animation anim, ArrayTexture tex) {
+	public void render(MeshBatch batch, int frame, ArrayTexture tex) {
 		GL20.glUseProgram(spriteShaderProgram.getProgramId());
 		
 		GL30.glBindVertexArray(batch.getMesh().getVaoId());
@@ -97,11 +97,37 @@ public class RenderEngine {
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
 		GL11.glBindTexture(GL30.GL_TEXTURE_2D_ARRAY, tex.getTextureId());
 		GL20.glUniform1i(spriteShaderProgram.getUniforms()[0].getLocation(), 0);
-		GL20.glUniform1i(spriteShaderProgram.getUniforms()[1].getLocation(), anim.getCurrentFrame());
+		GL20.glUniform1i(spriteShaderProgram.getUniforms()[1].getLocation(), frame);
 		
 		//GL20.glEnableVertexAttribArray(0);
 		GL31.glDrawArraysInstanced(GL11.GL_TRIANGLES, 0, batch.getMesh().getNumVertices(), batch.size());
 		batch.clear();  // TODO Figure out why this only works here
+	}
+	
+	public void render(GameObject object, int frame, ArrayTexture tex) {
+		GL20.glUseProgram(spriteShaderProgram.getProgramId());
+		
+		GL30.glBindVertexArray(object.getMesh().getVaoId());
+		
+		
+		//batch.loadBatch(camera);
+		Matrix4f finalMatrix = camera.getProjectionMatrix().multiply(camera.getWorldMatrix().multiply(object.getTransform().toMatrix()));
+		// Diffuse Texture
+		GL13.glActiveTexture(GL13.GL_TEXTURE0);
+		GL11.glBindTexture(GL30.GL_TEXTURE_2D_ARRAY, tex.getTextureId());
+		
+		//System.out.println(spriteShaderProgram.getUniforms()[0].getName() + " 0");
+		//System.out.println(spriteShaderProgram.getUniforms()[1].getName() + " 1");
+		//System.out.println(spriteShaderProgram.getUniforms()[2].getName() + " 2");
+		
+		GL20.glUniformMatrix4fv(spriteShaderProgram.getUniforms()[0].getLocation(), false, finalMatrix.toBuffer());
+		GL20.glUniform1i(spriteShaderProgram.getUniforms()[1].getLocation(), 0);
+		GL20.glUniform1i(spriteShaderProgram.getUniforms()[2].getLocation(), frame);
+		
+		//GL20.glEnableVertexAttribArray(0);
+		//GL31.glDrawArraysInstanced(GL11.GL_TRIANGLES, 0, batch.getMesh().getNumVertices(), batch.size());
+		//batch.clear();  // TODO Figure out why this only works here
+		GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, object.getMesh().getNumVertices());
 	}
 	
 	public void renderText(String text, Font font, float x, float y) {

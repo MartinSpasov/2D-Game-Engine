@@ -42,7 +42,7 @@ public class Scene {
 		}
 		
 		for (Mesh mesh : batches.keySet()) {
-			renderer.render(batches.get(mesh), Game.anim, Game.tex);
+			renderer.render(batches.get(mesh), Game.animComp.getCurrentFrame(), Game.tex);
 		}
 		
 	}

@@ -15,6 +15,10 @@ public class GameObject {
 	private Mesh mesh;
 	private Texture texture;	
 	
+	public GameObject(Mesh mesh, Texture texture) {
+		this(new Transform(), mesh, texture);
+	}
+	
 	public GameObject(Transform transform, Mesh mesh, Texture texture) {
 		this.transform = transform;
 		this.mesh = mesh;
@@ -30,6 +34,11 @@ public class GameObject {
 	
 	public void addComponent(ObjectComponent component) {
 		components.add(component);
+	}
+	
+	// TODO change this to a better way
+	public ObjectComponent getComponent(int i) {
+		return components.get(i);
 	}
 	
 	public void destroy() {

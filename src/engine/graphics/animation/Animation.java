@@ -26,6 +26,11 @@ public class Animation {
 		}
 	}
 	
+	public void reset() {
+		currentFrameIndex = 0;
+		timeElapsed = 0;
+	}
+	
 	public int getCurrentFrame() {
 		return frames[currentFrameIndex];
 	}
