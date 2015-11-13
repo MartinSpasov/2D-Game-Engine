@@ -19,7 +19,7 @@ public class AnimatorComponent extends ObjectComponent implements StateListener 
 	
 	public void changeState(String state) {
 		currentAnimation = animations.get(state);
-		//currentAnimation.reset();
+		currentAnimation.reset();
 	}
 	
 	public void addAnimation(String state, Animation animation) {

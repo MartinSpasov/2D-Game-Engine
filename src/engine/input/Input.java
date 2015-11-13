@@ -3,39 +3,98 @@ package engine.input;
 import java.util.ArrayList;
 
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
+import org.lwjgl.glfw.GLFWMouseButtonCallback;
+import org.lwjgl.glfw.GLFWScrollCallback;
 
 import engine.Window;
 
 public class Input {
 	
 	private ArrayList<KeyListener> keyListeners;
+	private ArrayList<MouseButtonListener> mouseButtonListeners;
+	private ArrayList<MouseMovementListener> mouseMovementListeners;
+	private ArrayList<MouseScrollListener> mouseScrollListeners;
 	
 	private GLFWKeyCallback keyCallback;
+	private GLFWMouseButtonCallback mouseButtonCallback;
+	private GLFWCursorPosCallback mouseMovementCallback;
+	private GLFWScrollCallback mouseScrollCallback;
 	
 	public Input(Window window) {
 		keyListeners = new ArrayList<KeyListener>();
+		mouseButtonListeners = new ArrayList<MouseButtonListener>();
+		mouseMovementListeners = new ArrayList<MouseMovementListener>();
+		mouseScrollListeners = new ArrayList<MouseScrollListener>();
 		
 		keyCallback = new GLFWKeyCallback() {
 
 			@Override
 			public void invoke(long window, int key, int scancode, int action, int mods) {
-				for (int i = 0; i < keyListeners.size(); i++) {
-					keyListeners.get(i).onKey(window, key, scancode, action, mods);
+				for (KeyListener listener : keyListeners) {
+					listener.onKey(window, key, scancode, action, mods);
 				}
 			}
 			
 		};
+		mouseButtonCallback = new GLFWMouseButtonCallback() {
+
+			@Override
+			public void invoke(long window, int button, int action, int mods) {
+				for (MouseButtonListener listener : mouseButtonListeners) {
+					listener.onMouseButton(window, button, action, mods);
+				}
+			}
+			
+		};
+		mouseMovementCallback = new GLFWCursorPosCallback() {
+
+			@Override
+			public void invoke(long window, double xPos, double yPos) {
+				for (MouseMovementListener listener : mouseMovementListeners) {
+					listener.onMouseMove(window, xPos, yPos);
+				}
+			}
+			
+		};
+		mouseScrollCallback = new GLFWScrollCallback() {
+			
+			@Override
+			public void invoke(long window, double xOffset, double yOffset) {
+				for (MouseScrollListener listener : mouseScrollListeners) {
+					listener.onMouseScroll(window, xOffset, yOffset);
+				}
+			}
+		};
 		
 		GLFW.glfwSetKeyCallback(window.getId(), keyCallback);
+		GLFW.glfwSetMouseButtonCallback(window.getId(), mouseButtonCallback);
+		GLFW.glfwSetCursorPosCallback(window.getId(), mouseMovementCallback);
+		GLFW.glfwSetScrollCallback(window.getId(), mouseScrollCallback);
 	}
 	
-	public int addKeyListener(KeyListener listener) {
+	public void registerKeyListener(KeyListener listener) {
 		keyListeners.add(listener);
-		return keyListeners.size() - 1;
 	}
 	
-	public void removeKeyListener(int id) {
-		keyListeners.remove(id);
+	// TODO Add way of removing listeners	
+	public void registerMouseButtonListener(MouseButtonListener listener) {
+		mouseButtonListeners.add(listener);
+	}
+	
+	public void registerMouseMovementListener(MouseMovementListener listener) {
+		mouseMovementListeners.add(listener);
+	}
+	
+	public void registerMouseScrollListener(MouseScrollListener listener) {
+		mouseScrollListeners.add(listener);
+	}
+
+	public void destroy() {
+		keyCallback.release();
+		mouseButtonCallback.release();
+		mouseMovementCallback.release();
+		mouseScrollCallback.release();
 	}
 }

@@ -38,7 +38,9 @@ public class PlatformerController2D extends ObjectComponent implements KeyListen
 			}
 			else if (action == GLFW.GLFW_RELEASE) {
 				left = false;
-				stateComponent.changeState("IDLE");
+				if (!right) {
+					stateComponent.changeState("IDLE");
+				}
 			}
 		}
 		
@@ -49,7 +51,9 @@ public class PlatformerController2D extends ObjectComponent implements KeyListen
 			}
 			else if (action == GLFW.GLFW_RELEASE) {
 				right = false;
-				stateComponent.changeState("IDLE");
+				if (!left) {
+					stateComponent.changeState("IDLE");
+				}
 			}
 		}
 	}

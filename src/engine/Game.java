@@ -1,8 +1,6 @@
 package engine;
 
 import java.nio.FloatBuffer;
-import java.util.Random;
-
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
@@ -12,7 +10,6 @@ import engine.console.Logger;
 import engine.graphics.ArrayTexture;
 import engine.graphics.Camera;
 import engine.graphics.Mesh;
-import engine.graphics.MeshBatch;
 import engine.graphics.RenderEngine;
 import engine.graphics.Texture;
 import engine.graphics.animation.Animation;
@@ -21,10 +18,8 @@ import engine.input.Input;
 import engine.input.KeyListener;
 import engine.math.Matrix4f;
 import engine.object.GameObject;
-import engine.object.Transform;
 import engine.object.component.AnimatorComponent;
 import engine.object.component.PlatformerController2D;
-import engine.object.component.RigidBodyComponent;
 import engine.object.component.StateComponent;
 import engine.physics.collision.CollisionEngine;
 import engine.resource.Resources;
@@ -82,11 +77,12 @@ public class Game implements KeyListener {
 		
 		//testCam = new Camera(Matrix4f.orthographic(-1, 1, 1, -1, NEAR_PLANE, FAR_PLANE));
 		testCam = new Camera(Matrix4f.perspective(-1, 1, 1, -1, NEAR_PLANE, FAR_PLANE));
+		testCam.getTransform().translate(0, 0, 2);
 		
 		renderer = new RenderEngine(testCam);
 		logger.log(renderer.getOpenGLVersion());
 		input = new Input(window);
-		input.addKeyListener(this);
+		input.registerKeyListener(this);
 		console = new Console();
 		
 		logger.log("Loading scene.");
@@ -101,8 +97,6 @@ public class Game implements KeyListener {
 		
 		// Texture Array
 		tex = Resources.loadArrayTexture("megaman_sheet.png", 1, 3);
-
-		Random rand = new Random();
 		
 		//stateComp = new StateComponent(obj,);
 		
@@ -122,7 +116,7 @@ public class Game implements KeyListener {
 		
 		PlatformerController2D controller = new PlatformerController2D(obj, stateComp);
 		obj.addComponent(controller);
-		input.addKeyListener(controller);
+		input.registerKeyListener(controller);
 		
 		//Resources.loadArrayTexture("megaman_sheet.png", 1, 3);
 		
@@ -306,6 +300,7 @@ public class Game implements KeyListener {
 		obj.destroy();
 		tex.destroy();
 		font.destroy();
+		input.destroy();
 		window.destroy();
 	}
 
