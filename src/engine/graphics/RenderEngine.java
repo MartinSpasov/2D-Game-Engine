@@ -9,7 +9,6 @@ import org.lwjgl.opengl.GL45;
 
 import engine.Game;
 import engine.console.Logger;
-import engine.graphics.animation.Animation;
 import engine.graphics.shader.ShaderProgram;
 import engine.graphics.shader.Uniform;
 import engine.graphics.text.Font;
@@ -104,7 +103,7 @@ public class RenderEngine {
 		batch.clear();  // TODO Figure out why this only works here
 	}
 	
-	public void render(GameObject object, int frame, ArrayTexture tex) {
+	public void render(GameObject object, int frame, ArrayTexture tex, boolean horizontalFlip) {
 		GL20.glUseProgram(spriteShaderProgram.getProgramId());
 		
 		GL30.glBindVertexArray(object.getMesh().getVaoId());
@@ -119,10 +118,12 @@ public class RenderEngine {
 		//System.out.println(spriteShaderProgram.getUniforms()[0].getName() + " 0");
 		//System.out.println(spriteShaderProgram.getUniforms()[1].getName() + " 1");
 		//System.out.println(spriteShaderProgram.getUniforms()[2].getName() + " 2");
+		//System.out.println(spriteShaderProgram.getUniforms()[3].getName() + " 3");
 		
 		GL20.glUniformMatrix4fv(spriteShaderProgram.getUniforms()[0].getLocation(), false, finalMatrix.toBuffer());
-		GL20.glUniform1i(spriteShaderProgram.getUniforms()[1].getLocation(), 0);
-		GL20.glUniform1i(spriteShaderProgram.getUniforms()[2].getLocation(), frame);
+		GL20.glUniform1i(spriteShaderProgram.getUniforms()[2].getLocation(), 0);
+		GL20.glUniform1i(spriteShaderProgram.getUniforms()[3].getLocation(), frame);
+		GL20.glUniform1i(spriteShaderProgram.getUniforms()[1].getLocation(), (horizontalFlip) ? GL11.GL_TRUE:GL11.GL_FALSE);
 		
 		//GL20.glEnableVertexAttribArray(0);
 		//GL31.glDrawArraysInstanced(GL11.GL_TRIANGLES, 0, batch.getMesh().getNumVertices(), batch.size());

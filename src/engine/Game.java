@@ -55,6 +55,8 @@ public class Game implements KeyListener {
 	
 	private int fps;
 	
+	public static boolean flip;
+	
 	public static final float SPEED = 3f;
 	
 	public static final int MAX_INSTANCE_COUNT = 10000;
@@ -258,27 +260,21 @@ public class Game implements KeyListener {
 	
 	public void tick(float delta) {
 		if (w) {
-			//testObject.getTransform().translate(0, SPEED * delta, 0);
 			testCam.getTransform().translate(0, 0, -SPEED * delta);
 		}
 		if (s) {
-			//testObject.getTransform().translate(0, -SPEED * delta, 0);
 			testCam.getTransform().translate(0, 0, SPEED * delta);
 		}
 		if (a) {
-			//testObject.getTransform().translate(-SPEED * delta, 0, 0);
 			testCam.getTransform().translate(-SPEED * delta, 0, 0);
 		}
 		if (d) {
-			//testObject.getTransform().translate(SPEED * delta, 0, 0);
 			testCam.getTransform().translate(SPEED * delta, 0, 0);
 		}
 		if (q) {
-			//testObject.getTransform().setZRot(testObject.getTransform().getZRot() + (SPEED * delta));
 			testCam.getTransform().setZRot(testCam.getTransform().getZRot() + (SPEED * delta));
 		}
 		if (e) {
-			//testObject.getTransform().setZRot(testObject.getTransform().getZRot() - (SPEED * delta));
 			testCam.getTransform().setZRot(testCam.getTransform().getZRot() - (SPEED * delta));
 		}
 		scene.tick(delta);
@@ -288,7 +284,7 @@ public class Game implements KeyListener {
 	public void render() {
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 		scene.render();
-		renderer.render(obj, animComp.getCurrentFrame(), tex);
+		renderer.render(obj, animComp.getCurrentFrame(), tex, flip);
 		renderer.renderText("FPS: " + fps, font, -0.5f, -0.5f);
 		renderer.checkError(logger);
 	}

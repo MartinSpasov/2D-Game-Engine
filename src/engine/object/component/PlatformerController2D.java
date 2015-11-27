@@ -2,6 +2,7 @@ package engine.object.component;
 
 import org.lwjgl.glfw.GLFW;
 
+import engine.Game;
 import engine.input.KeyListener;
 import engine.object.GameObject;
 
@@ -35,6 +36,7 @@ public class PlatformerController2D extends ObjectComponent implements KeyListen
 			if (action == GLFW.GLFW_PRESS) {
 				left = true;
 				stateComponent.changeState("MOVING");
+				Game.flip = true; // TODO remove after done testing
 			}
 			else if (action == GLFW.GLFW_RELEASE) {
 				left = false;
@@ -48,6 +50,7 @@ public class PlatformerController2D extends ObjectComponent implements KeyListen
 			if (action == GLFW.GLFW_PRESS) {
 				right = true;
 				stateComponent.changeState("MOVING");
+				Game.flip = false; // TODO remove after done testing
 			}
 			else if (action == GLFW.GLFW_RELEASE) {
 				right = false;

@@ -8,10 +8,18 @@ uniform sampler2DArray diffuseTextureAtlas;
 
 uniform int currentFrame;
 
+uniform bool horizontalFlip;
+
 void main() {
 	//color = outColor;
 	
-	vec4 textureColor = texture(diffuseTextureAtlas, vec3(textureCoord.x, textureCoord.y, currentFrame));
+	vec4 textureColor;
+	if (horizontalFlip) {
+		textureColor = texture(diffuseTextureAtlas, vec3((1.0 - textureCoord.x), textureCoord.y, currentFrame));
+	}
+	else {
+		textureColor = texture(diffuseTextureAtlas, vec3(textureCoord.x, textureCoord.y, currentFrame));
+	}
 	
 	if (textureColor.a == 0) {
 		discard;
