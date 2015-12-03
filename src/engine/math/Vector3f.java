@@ -49,7 +49,7 @@ public class Vector3f {
 	}
 	
 	public Vector3f normalize() {
-		float norm = getNorm();
+		float norm = norm();
 		return new Vector3f(x / norm, y / norm, z / norm);
 	}
 	
@@ -78,18 +78,16 @@ public class Vector3f {
 		return new Vector3f(x2, y2, z);
 	}
 	
-//	public Vector3f rotate(float angle, Vector3f axis) {
-//		Quaternion quat1 = new Quaternion(angle, axis);
-//		Quaternion quat2 = new Quaternion(0.0f, x, y, z);
-//		Quaternion quat3 = new Quaternion(quat1.getW(), -quat1.getX(), -quat1.getY(), -quat1.getZ());
-//		
-//		
-//		Quaternion finalQuat = quat1.multiply(quat2).multiply(quat3);
-//		
-//		return new Vector3f(finalQuat.getX(), finalQuat.getY(), finalQuat.getZ());
-//	}
+	public Vector3f rotate(float angle, Vector3f axis) {
+		Quaternion q1 = new Quaternion(angle, axis);
+		Quaternion q2 = new Quaternion(0.0f, x, y, z);
+		
+		Quaternion finalQuat = q1.multiply(q2).multiply(q1.conjugate());
+		
+		return new Vector3f(finalQuat.b, finalQuat.c, finalQuat.d);
+	}
 	
-	public float getNorm() {
+	public float norm() {
 		return (float) Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2));
 	}
 	

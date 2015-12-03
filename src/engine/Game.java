@@ -1,6 +1,7 @@
 package engine;
 
 import java.nio.FloatBuffer;
+
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
@@ -17,6 +18,7 @@ import engine.graphics.text.Font;
 import engine.input.Input;
 import engine.input.KeyListener;
 import engine.math.Matrix4f;
+import engine.math.Vector3f;
 import engine.object.GameObject;
 import engine.object.component.AnimatorComponent;
 import engine.object.component.PlatformerController2D;

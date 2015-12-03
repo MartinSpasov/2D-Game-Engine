@@ -10,7 +10,7 @@ public class Camera {
 	private Matrix4f projectionMatrix;
 	
 	public Camera(Camera camera) {
-		this(camera.getTransform(), camera.getProjectionMatrix());
+		this(new Transform(camera.getTransform()), new Matrix4f(camera.getProjectionMatrix()));
 	}
 	
 	public Camera(Matrix4f projectionMatrix) {

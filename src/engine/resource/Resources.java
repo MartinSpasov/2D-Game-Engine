@@ -84,5 +84,4 @@ public class Resources {
 		
 		return new Texture(data, width.get(0), height.get(0));
 	}
-	
 }

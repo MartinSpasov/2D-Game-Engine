@@ -20,6 +20,10 @@ public class Transform {
 		this(0.0f, 0.0f, 0.0f);
 	}
 	
+	public Transform(Transform t) {
+		this(t.getXPos(), t.getYPos(), t.getZPos(), t.getXRot(), t.getYRot(), t.getZRot(), t.getXScale(), t.getYScale(), t.getZScale());
+	}
+	
 	public Transform(float xPos, float yPos, float zPos) {
 		this(xPos, yPos, zPos, 0.0f, 0.0f, 0.0f);
 	}
