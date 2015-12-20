@@ -1,11 +1,13 @@
 package engine.graphics;
 
+import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL31;
 import org.lwjgl.opengl.GL45;
+import org.lwjgl.opengl.GLCapabilities;
 
 import engine.Game;
 import engine.console.Logger;
@@ -22,6 +24,8 @@ public class RenderEngine {
 	public static final float[] PLANE_VERTS = new float[]{-0.5f,0.5f,0.0f, -0.5f,-0.5f,0.0f, 0.5f,0.5f,0.f, 0.5f,0.5f,0.0f, -0.5f,-0.5f,0.0f, 0.5f,-0.5f, 0.0f};
 	public static final float[] PLANE_UV = new float[]{0.0f,0.0f,0.0f,1.0f,1.0f,0.0f,1.0f,0.0f,0.0f,1.0f,1.0f,1.0f};
 	
+	private GLCapabilities capabilities;
+	
 	private Camera camera;
 	
 	private ShaderProgram defaultShaderProgram;
@@ -31,6 +35,7 @@ public class RenderEngine {
 	
 	public RenderEngine(Camera camera) {
 		this.camera = camera;
+		capabilities = GL.createCapabilities();
 		defaultShaderProgram = new ShaderProgram(Resources.loadText("default_vert.shader"), Resources.loadText("default_frag.shader"));
 		instanceShaderProgram = new ShaderProgram(Resources.loadText("instance_vert.shader"), Resources.loadText("instance_frag.shader"));
 		textShaderProgram = new ShaderProgram(Resources.loadText("text_vert.shader"), Resources.loadText("text_frag.shader"));

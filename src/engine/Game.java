@@ -18,7 +18,6 @@ import engine.graphics.text.Font;
 import engine.input.Input;
 import engine.input.KeyListener;
 import engine.math.Matrix4f;
-import engine.math.Vector3f;
 import engine.object.GameObject;
 import engine.object.component.AnimatorComponent;
 import engine.object.component.PlatformerController2D;
@@ -77,12 +76,11 @@ public class Game implements KeyListener {
 	public Game() {
 		logger = new Logger(System.out);
 		logger.log("Initializing subsystems.");
-		window = new Window(500,500, "Test");
+		window = new Window("Test", 500,500);
 		
 		//testCam = new Camera(Matrix4f.orthographic(-1, 1, 1, -1, NEAR_PLANE, FAR_PLANE));
 		testCam = new Camera(Matrix4f.perspective(-1, 1, 1, -1, NEAR_PLANE, FAR_PLANE));
 		testCam.getTransform().translate(0, 0, 2);
-		
 		renderer = new RenderEngine(testCam);
 		logger.log(renderer.getOpenGLVersion());
 		input = new Input(window);

@@ -62,4 +62,24 @@ public class Quaternion {
 	public String toString() {
 		return (a + " + " + b + "i + " + c + "j + " + d + "k");
 	}
+	
+	public boolean equals(Quaternion q, double epsilon) {
+		double deltaA = Math.abs(q.a - a);
+		double deltaB = Math.abs(q.b - b);
+		double deltaC = Math.abs(q.c - c);
+		double deltaD = Math.abs(q.d - d);
+		
+		return (deltaA < epsilon && deltaB < epsilon && deltaC < epsilon && deltaD < epsilon);
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof Quaternion) {
+			Quaternion q = (Quaternion) o;
+			return equals(q, 0.005);
+		}
+		else {
+			return false;
+		}
+	}
 }

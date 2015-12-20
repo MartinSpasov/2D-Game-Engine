@@ -1,10 +1,9 @@
 package engine;
-import org.lwjgl.glfw.Callbacks;
+
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GLContext;
 import org.lwjgl.system.MemoryUtil;
 
 public class Window {
@@ -14,9 +13,9 @@ public class Window {
 	private GLFWErrorCallback errorCallback;
 	private GLFWWindowSizeCallback sizeCallback;
 	
-	public Window(int width, int height, String title) {
+	public Window(String title, int width, int height) {
 		
-		errorCallback = Callbacks.errorCallbackPrint(System.err);
+		errorCallback = GLFWErrorCallback.createPrint(System.err);
 		GLFW.glfwSetErrorCallback(errorCallback);
 		
 		if (GLFW.glfwInit() == -1) {
@@ -30,7 +29,7 @@ public class Window {
 		}
 		
 		GLFW.glfwMakeContextCurrent(id);
-		GLContext.createFromCurrent();
+		//GLContext.createFromCurrent();
 		
 		GLFW.glfwSwapInterval(1);
 		GLFW.glfwShowWindow(id);
