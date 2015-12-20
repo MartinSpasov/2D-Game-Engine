@@ -24,6 +24,7 @@ import engine.object.component.PlatformerController2D;
 import engine.object.component.StateComponent;
 import engine.physics.collision.CollisionEngine;
 import engine.resource.Resources;
+import engine.sound.SoundEngine;
 
 public class Game implements KeyListener {
 
@@ -31,6 +32,7 @@ public class Game implements KeyListener {
 	private RenderEngine renderer;
 	private Input input;
 	private Console console;
+	private SoundEngine soundEngine;
 	public static Logger logger; // FIXME change this back to private
 	private CollisionEngine collisionHandler;
 	
@@ -82,6 +84,7 @@ public class Game implements KeyListener {
 		testCam = new Camera(Matrix4f.perspective(-1, 1, 1, -1, NEAR_PLANE, FAR_PLANE));
 		testCam.getTransform().translate(0, 0, 2);
 		renderer = new RenderEngine(testCam);
+		soundEngine = new SoundEngine();
 		logger.log(renderer.getOpenGLVersion());
 		input = new Input(window);
 		input.registerKeyListener(this);
@@ -291,6 +294,7 @@ public class Game implements KeyListener {
 	
 	public void destroy() {
 		console.destroy();
+		soundEngine.destroy();
 		renderer.destroy();
 		scene.destroy();
 		obj.destroy();

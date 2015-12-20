@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -14,9 +15,11 @@ import javax.imageio.ImageIO;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.stb.STBImage;
+import org.lwjgl.stb.STBVorbis;
 
 import engine.graphics.ArrayTexture;
 import engine.graphics.Texture;
+import engine.sound.Sound;
 
 public class Resources {
 
@@ -83,5 +86,16 @@ public class Resources {
 		ByteBuffer data = STBImage.stbi_load(fileName, width, height, channels, 4);
 		
 		return new Texture(data, width.get(0), height.get(0));
+	}
+	
+	public static Sound loadSound(String fileName) {
+		IntBuffer channels = BufferUtils.createIntBuffer(1);
+		IntBuffer sampleRate = BufferUtils.createIntBuffer(1);
+		ShortBuffer data = STBVorbis.stb_vorbis_decode_filename(fileName, channels, sampleRate);
+		
+		System.out.println(channels.get(0));
+		System.out.println(sampleRate.get(0));
+		
+		return new Sound(data, sampleRate.get(0));
 	}
 }
