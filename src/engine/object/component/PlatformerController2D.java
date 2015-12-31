@@ -21,7 +21,7 @@ public class PlatformerController2D extends ObjectComponent implements KeyListen
 	}
 
 	@Override
-	public void tick(float delta) {
+	public void tick(float delta, Game game) {
 		if (left) {
 			getParentObject().getTransform().translate(-SPEED * delta, 0, 0);
 		}
@@ -35,7 +35,7 @@ public class PlatformerController2D extends ObjectComponent implements KeyListen
 		if (key == GLFW.GLFW_KEY_LEFT) {
 			if (action == GLFW.GLFW_PRESS) {
 				left = true;
-				stateComponent.changeState("MOVING");
+				stateComponent.changeState("WALKING");
 				Game.flip = true; // TODO remove after done testing
 			}
 			else if (action == GLFW.GLFW_RELEASE) {
@@ -49,7 +49,7 @@ public class PlatformerController2D extends ObjectComponent implements KeyListen
 		if (key == GLFW.GLFW_KEY_RIGHT) {
 			if (action == GLFW.GLFW_PRESS) {
 				right = true;
-				stateComponent.changeState("MOVING");
+				stateComponent.changeState("WALKING");
 				Game.flip = false; // TODO remove after done testing
 			}
 			else if (action == GLFW.GLFW_RELEASE) {

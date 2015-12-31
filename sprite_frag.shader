@@ -4,21 +4,29 @@ in vec2 textureCoord;
 
 out vec4 color;
 
-uniform sampler2DArray diffuseTextureAtlas;
-
-uniform int currentFrame;
+uniform sampler2D sprite;
 
 uniform bool horizontalFlip;
+uniform bool verticalFlip;
 
 void main() {
-	//color = outColor;
-	
+
 	vec4 textureColor;
 	if (horizontalFlip) {
-		textureColor = texture(diffuseTextureAtlas, vec3((1.0 - textureCoord.x), textureCoord.y, currentFrame));
+		if (verticalFlip) {
+			textureColor = texture(sprite, vec2((1.0 - textureCoord.x), (1.0 - textureCoord.y)));
+		}
+		else {
+			textureColor = texture(sprite, vec2((1.0 - textureCoord.x), textureCoord.y));
+		}
 	}
 	else {
-		textureColor = texture(diffuseTextureAtlas, vec3(textureCoord.x, textureCoord.y, currentFrame));
+		if (verticalFlip) {
+			textureColor = texture(sprite, vec2(textureCoord.x, (1.0 - textureCoord.y)));
+		}
+		else {
+			textureColor = texture(sprite, vec2(textureCoord.x, textureCoord.y));
+		}		
 	}
 	
 	if (textureColor.a == 0) {
@@ -26,5 +34,4 @@ void main() {
 	}
 	
 	color = textureColor;
-	//color = vec4(1.0,0.0,0.0,1.0);
 }

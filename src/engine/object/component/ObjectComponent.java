@@ -1,5 +1,6 @@
 package engine.object.component;
 
+import engine.Game;
 import engine.object.GameObject;
 
 abstract public class ObjectComponent {
@@ -14,5 +15,5 @@ abstract public class ObjectComponent {
 		return parentObject;
 	}
 	
-	public abstract void tick(float delta);
+	public abstract void tick(float delta, Game game);
 }

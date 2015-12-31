@@ -1,5 +1,6 @@
 package engine.object.component;
 
+import engine.Game;
 import engine.object.GameObject;
 import engine.object.Transform;
 import engine.physics.geometry.Shape;
@@ -14,7 +15,7 @@ public class ColliderComponent extends ObjectComponent {
 	}
 
 	@Override
-	public void tick(float delta) {
+	public void tick(float delta, Game game) {
 		Transform t = getParentObject().getTransform();
 		
 		shape.setX(t.getXPos());

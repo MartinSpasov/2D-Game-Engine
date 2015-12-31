@@ -93,9 +93,6 @@ public class Resources {
 		IntBuffer sampleRate = BufferUtils.createIntBuffer(1);
 		ShortBuffer data = STBVorbis.stb_vorbis_decode_filename(fileName, channels, sampleRate);
 		
-		System.out.println(channels.get(0));
-		System.out.println(sampleRate.get(0));
-		
 		return new Sound(data, sampleRate.get(0));
 	}
 }

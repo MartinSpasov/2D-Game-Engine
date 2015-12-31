@@ -7,7 +7,6 @@ out vec4 color;
 uniform sampler2D diffuseTexture;
 
 void main() {
-	//color = outColor;
 	
 	vec4 textureColor = texture(diffuseTexture, textureCoord);
 	

@@ -30,4 +30,9 @@ public class Uniform {
 	public int getType() {
 		return type;
 	}
+	
+	@Override
+	public String toString() {
+		return name;
+	}
 }

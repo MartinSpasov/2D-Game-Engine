@@ -10,8 +10,7 @@ import engine.console.Console;
 import engine.console.Logger;
 import engine.graphics.ArrayTexture;
 import engine.graphics.Camera;
-import engine.graphics.Mesh;
-import engine.graphics.RenderEngine;
+import engine.graphics.RenderSystem;
 import engine.graphics.Texture;
 import engine.graphics.animation.Animation;
 import engine.graphics.text.Font;
@@ -21,30 +20,24 @@ import engine.math.Matrix4f;
 import engine.object.GameObject;
 import engine.object.component.AnimatorComponent;
 import engine.object.component.PlatformerController2D;
+import engine.object.component.SpriteComponent;
 import engine.object.component.StateComponent;
-import engine.physics.collision.CollisionEngine;
 import engine.resource.Resources;
-import engine.sound.SoundEngine;
+import engine.sound.SoundSystem;
 
 public class Game implements KeyListener {
 
 	private Window window;
-	private RenderEngine renderer;
+	private RenderSystem renderSystem;
 	private Input input;
 	private Console console;
-	private SoundEngine soundEngine;
+	private SoundSystem soundSystem;
 	public static Logger logger; // FIXME change this back to private
-	private CollisionEngine collisionHandler;
+	//private CollisionSystem collisionSystem;
 	
 	private Camera testCam;
 	
 	private Scene scene;
-	
-	private GameObject obj;
-	
-	public static ArrayTexture tex;
-	public static AnimatorComponent animComp;
-	private StateComponent stateComp;
 	
 	public static final float NEAR_PLANE = 1f;
 	public static final float FAR_PLANE = 1000f;
@@ -58,16 +51,16 @@ public class Game implements KeyListener {
 	
 	private int fps;
 	
-	public static boolean flip;
-	
 	public static final float SPEED = 3f;
 	
 	public static final int MAX_INSTANCE_COUNT = 10000;
-	//private double counter;
-	
-	public static Mesh mesh;
 	
 	private Font font;
+	
+	private Texture texture;
+	private ArrayTexture texture2;
+	
+	public static boolean flip;
 	
 	public static void main(String[] args) {
 		Game game = new Game();
@@ -83,47 +76,49 @@ public class Game implements KeyListener {
 		//testCam = new Camera(Matrix4f.orthographic(-1, 1, 1, -1, NEAR_PLANE, FAR_PLANE));
 		testCam = new Camera(Matrix4f.perspective(-1, 1, 1, -1, NEAR_PLANE, FAR_PLANE));
 		testCam.getTransform().translate(0, 0, 2);
-		renderer = new RenderEngine(testCam);
-		soundEngine = new SoundEngine();
-		logger.log(renderer.getOpenGLVersion());
+		renderSystem = new RenderSystem(testCam);
+		soundSystem = new SoundSystem();
+		logger.log(renderSystem.getOpenGLVersion());
 		input = new Input(window);
 		input.registerKeyListener(this);
 		console = new Console();
 		
 		logger.log("Loading scene.");
-		scene = new Scene(renderer);
-		collisionHandler = new CollisionEngine();
-		
-		mesh = new Mesh(toBuffer(RenderEngine.PLANE_VERTS), toBuffer(RenderEngine.PLANE_UV));
+		scene = new Scene();
+		//collisionSystem = new CollisionSystem();
 		
 		
 		// Texture
-		Texture texture = Resources.loadTexture("megaman.png");
+		texture = Resources.loadTexture("megaman.png");
 		
-		// Texture Array
-		tex = Resources.loadArrayTexture("megaman_sheet.png", 1, 3);
+		for (int i = 0; i < 1000; i++) {
+			GameObject obj = new GameObject();
+			SpriteComponent comp = new SpriteComponent(obj, texture);
+			obj.addComponent(comp);
+			obj.getTransform().translate(0, 0, -i);
+			scene.addObject(obj);
+		}
 		
-		//stateComp = new StateComponent(obj,);
+		GameObject obj = new GameObject();
+		obj.getTransform().translate(1,0,-1);
+		texture2 = Resources.loadArrayTexture("megaman_sheet.png", 1, 3);
+		Animation animWalk = new Animation(new int[]{0,1,2}, new float[]{0.2f,0.2f,0.2f});
+		Animation animIdle = new Animation(new int[]{0}, new float[]{0.0f});
 		
-		obj = new GameObject(mesh, texture);
+		AnimatorComponent animComp = new AnimatorComponent(obj, "IDLE", animIdle, texture2);
+		animComp.addAnimation("WALKING", animWalk);
 		
-		Animation animWalk = new Animation(new int[]{0,1,2}, new float[]{0.15f,0.15f,0.15f});
-		Animation animIdle = new Animation(new int[]{0}, new float[]{0});
+		StateComponent states = new StateComponent(obj, "IDLE");
+		states.registerListener(animComp);
 		
-		stateComp = new StateComponent(obj, "IDLE");
-		animComp = new AnimatorComponent(obj, "IDLE", animIdle);
+		PlatformerController2D control = new PlatformerController2D(obj, states);
+		input.registerKeyListener(control);
 		
-		animComp.addAnimation("MOVING", animWalk);
-		stateComp.registerListener(animComp);
-		
-		obj.addComponent(stateComp);
 		obj.addComponent(animComp);
+		obj.addComponent(states);
+		obj.addComponent(control);
 		
-		PlatformerController2D controller = new PlatformerController2D(obj, stateComp);
-		obj.addComponent(controller);
-		input.registerKeyListener(controller);
-		
-		//Resources.loadArrayTexture("megaman_sheet.png", 1, 3);
+		scene.addObject(obj);
 		
 		font = new Font(Resources.loadArrayTexture("samplefont.png", 14, 16), 0);
 		font.addCharacterMapping(' ', 0);
@@ -228,23 +223,24 @@ public class Game implements KeyListener {
 		double counter = 0;
 		double delta = 0;
 		double currentTime = 0;
-		
-		//double t1 = 0;
-		//double t2 = 0;
-		
+
 		logger.log("Entering loop.");
+		
+		double time1 = 0;
 		
 		while (GLFW.glfwWindowShouldClose(window.getId()) == GL11.GL_FALSE) {
 			currentTime = GLFW.glfwGetTime();
 			GLFW.glfwPollEvents();
 			
-			//t1 = GLFW.glfwGetTime();
-			tick((float)delta);
-			//logger.log("TICK: " + ((GLFW.glfwGetTime() - t1) * 1000) + " ms");
+			time1 = GLFW.glfwGetTime();
 			
-			//t2 = GLFW.glfwGetTime();
+			tick((float)delta);
+			
 			render();
-			//logger.log("RENDER: " + ((GLFW.glfwGetTime() - t2) * 1000) + " ms");
+			
+			if (GLFW.glfwGetTime() - time1 > 0.01666) {
+				logger.log("ENGINE IS LAGGING!");
+			}
 			
 			window.swapBuffers();
 			delta = GLFW.glfwGetTime() - currentTime;
@@ -280,28 +276,25 @@ public class Game implements KeyListener {
 		if (e) {
 			testCam.getTransform().setZRot(testCam.getTransform().getZRot() - (SPEED * delta));
 		}
-		scene.tick(delta);
-		obj.tick(delta);
+		scene.tick(delta, this);
 	}
 	
 	public void render() {
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-		scene.render();
-		renderer.render(obj, animComp.getCurrentFrame(), tex, flip);
-		renderer.renderText("FPS: " + fps, font, -0.5f, -0.5f);
-		renderer.checkError(logger);
+		renderSystem.renderAll();
+		renderSystem.renderText("FPS: " + fps, font, -0.5f, -0.5f);
+		renderSystem.checkError(logger);
 	}
 	
 	public void destroy() {
 		console.destroy();
-		soundEngine.destroy();
-		renderer.destroy();
-		scene.destroy();
-		obj.destroy();
-		tex.destroy();
+		renderSystem.destroy();
+		soundSystem.destroy();
 		font.destroy();
 		input.destroy();
 		window.destroy();
+		texture.destroy();
+		texture2.destroy();
 	}
 
 	@Override
@@ -360,8 +353,12 @@ public class Game implements KeyListener {
 
 	}
 	
+	public RenderSystem getRenderSystem() {
+		return renderSystem;
+	}
+	
 	// TODO remove later
-	private FloatBuffer toBuffer(float[] data) {
+	public static FloatBuffer toBuffer(float[] data) {
 		FloatBuffer buffer = BufferUtils.createFloatBuffer(data.length);
 		for (int i = 0; i < data.length; i++) {
 			buffer.put(data[i]);

@@ -2,16 +2,20 @@ package engine.object.component;
 
 import java.util.HashMap;
 
+import engine.Game;
+import engine.graphics.ArrayTexture;
 import engine.graphics.animation.Animation;
 import engine.object.GameObject;
 
 public class AnimatorComponent extends ObjectComponent implements StateListener {
-
+	
+	private ArrayTexture texture;
 	private HashMap<String, Animation> animations;
 	private Animation currentAnimation;
 	
-	public AnimatorComponent(GameObject parentObject, String currentState, Animation currentAnimation) {
+	public AnimatorComponent(GameObject parentObject, String currentState, Animation currentAnimation, ArrayTexture texture) {
 		super(parentObject);
+		this.texture = texture;
 		animations = new HashMap<String, Animation>();
 		animations.put(currentState, currentAnimation);
 		this.currentAnimation = currentAnimation;
@@ -34,15 +38,20 @@ public class AnimatorComponent extends ObjectComponent implements StateListener 
 	public int getCurrentFrame() {
 		return currentAnimation.getCurrentFrame();
 	}
+	
+	public ArrayTexture getTexture() {
+		return texture;
+	}
 
 	@Override
 	public void receiveStateChange(String state) {
 		changeState(state);
 	}
-	
+
 	@Override
-	public void tick(float delta) {
+	public void tick(float delta, Game game) {
 		currentAnimation.tick(delta);
+		game.getRenderSystem().addAnimatorComponent(this);
 	}
 
 }

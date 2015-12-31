@@ -4,11 +4,11 @@ import java.util.HashSet;
 
 import engine.object.GameObject;
 
-public class CollisionEngine {
+public class CollisionSystem {
 
 	private HashSet<ObjectPair> pairs;
 	
-	public CollisionEngine() {
+	public CollisionSystem() {
 		pairs = new HashSet<ObjectPair>();
 	}
 	

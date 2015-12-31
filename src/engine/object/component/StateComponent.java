@@ -2,6 +2,7 @@ package engine.object.component;
 
 import java.util.ArrayList;
 
+import engine.Game;
 import engine.object.GameObject;
 
 public class StateComponent extends ObjectComponent {
@@ -31,10 +32,11 @@ public class StateComponent extends ObjectComponent {
 		listeners.add(listener);
 	}
 
-	// TODO add way of removing listeners
-	
 	@Override
-	public void tick(float delta) {
+	public void tick(float delta, Game game) {
+		
 	}
+
+	// TODO add way of removing listeners
 
 }

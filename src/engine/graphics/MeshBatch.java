@@ -60,7 +60,6 @@ public class MeshBatch {
 		
 		for (int i = 0; i < modelMatrices.size(); i++) {
 			Matrix4f mvpMatrix = pvMatrix.multiply(modelMatrices.get(i)); 
-			
 			buffer.put(mvpMatrix.m00);
 			buffer.put(mvpMatrix.m10);
 			buffer.put(mvpMatrix.m20);
@@ -81,7 +80,6 @@ public class MeshBatch {
 		
 		GL15.glUnmapBuffer(GL15.GL_ARRAY_BUFFER);
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-		//modelMatrices.clear();
 	}
 	
 	public Mesh getMesh() {
