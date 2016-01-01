@@ -1,17 +1,19 @@
 package engine.graphics.shader;
 
 import java.nio.IntBuffer;
+import java.util.HashMap;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
+
 import engine.Game;
 
 public class ShaderProgram {
 
 	private int programId;
 	
-	private Uniform[] uniforms;
+	private HashMap<String, Uniform> uniforms;
 	
 	public ShaderProgram(String vertSrc, String fragSrc) {
 		// TODO handle shader compilation error
@@ -47,13 +49,13 @@ public class ShaderProgram {
 		GL20.glGetProgramiv(programId, GL20.GL_ACTIVE_UNIFORMS, countBuffer);
 		int count = countBuffer.get(0);
 		
-		uniforms = new Uniform[count];
+		uniforms = new HashMap<String, Uniform>();
 		for (int i = 0; i < count; i++) {
 			IntBuffer size = BufferUtils.createIntBuffer(1);
 			IntBuffer type = BufferUtils.createIntBuffer(1);
 			String name = GL20.glGetActiveUniform(programId, i, size, type);
 			int location = GL20.glGetUniformLocation(programId, name);
-			uniforms[i] = new Uniform(name, location, size.get(0), type.get(0));
+			uniforms.put(name, new Uniform(name, location, size.get(0), type.get(0)));
 		}
 		
 		// Clean up.
@@ -68,8 +70,9 @@ public class ShaderProgram {
 		return programId;
 	}
 	
-	public Uniform[] getUniforms() {
-		return uniforms;
+	public Uniform getUniform(String name) {
+		// TODO check if uniform actually exists
+		return uniforms.get(name);
 	}
 	
 	public void destroy() {

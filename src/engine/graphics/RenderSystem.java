@@ -15,7 +15,6 @@ import org.lwjgl.opengl.GLCapabilities;
 import engine.Game;
 import engine.console.Logger;
 import engine.graphics.shader.ShaderProgram;
-import engine.graphics.shader.Uniform;
 import engine.graphics.text.Font;
 import engine.math.Matrix4f;
 import engine.object.GameObject;
@@ -66,7 +65,6 @@ public class RenderSystem {
 		
 			
 		//GL20.glUseProgram(defaultShaderProgram.getProgramId());
-	
 	}
 
 	public void render(MeshBatch batch) {
@@ -80,7 +78,7 @@ public class RenderSystem {
 		// Diffuse Texture
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, batch.getTexture().getTextureId());
-		GL20.glUniform1i(instanceShaderProgram.getUniforms()[0].getLocation(), 0);
+		GL20.glUniform1i(instanceShaderProgram.getUniform("diffuseTexture").getLocation(), 0);
 		
 		//GL20.glEnableVertexAttribArray(0);
 		GL31.glDrawArraysInstanced(GL11.GL_TRIANGLES, 0, batch.getMesh().getNumVertices(), batch.size());
@@ -92,26 +90,18 @@ public class RenderSystem {
 		
 		GL30.glBindVertexArray(flatPlane.getVaoId());
 		
-		
-		//batch.loadBatch(camera);
 		Matrix4f finalMatrix = camera.getProjectionMatrix().multiply(camera.getWorldMatrix().multiply(object.getTransform().toMatrix()));
+		
 		// Diffuse Texture
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
 		GL11.glBindTexture(GL30.GL_TEXTURE_2D_ARRAY, tex.getTextureId());
-		
-		//System.out.println(spriteShaderProgram.getUniforms()[0].getName() + " 0");
-		//System.out.println(spriteShaderProgram.getUniforms()[1].getName() + " 1");
-		//System.out.println(spriteShaderProgram.getUniforms()[2].getName() + " 2");
-		//System.out.println(spriteShaderProgram.getUniforms()[3].getName() + " 3");
-		
-		GL20.glUniformMatrix4fv(spriteShaderProgram.getUniforms()[0].getLocation(), false, finalMatrix.toBuffer());
-		GL20.glUniform1i(spriteShaderProgram.getUniforms()[2].getLocation(), 0);
-		GL20.glUniform1i(spriteShaderProgram.getUniforms()[3].getLocation(), frame);
-		GL20.glUniform1i(spriteShaderProgram.getUniforms()[1].getLocation(), (horizontalFlip) ? GL11.GL_TRUE:GL11.GL_FALSE);
-		
-		//GL20.glEnableVertexAttribArray(0);
-		//GL31.glDrawArraysInstanced(GL11.GL_TRIANGLES, 0, batch.getMesh().getNumVertices(), batch.size());
-		//batch.clear();  // TODO Figure out why this only works here
+
+		GL20.glUniformMatrix4fv(animSpriteShaderProgram.getUniform("mvpMatrix").getLocation(), false, finalMatrix.toBuffer());
+		GL20.glUniform1i(animSpriteShaderProgram.getUniform("diffuseTextureAtlas").getLocation(), 0);
+		GL20.glUniform1i(animSpriteShaderProgram.getUniform("currentFrame").getLocation(), frame);
+		GL20.glUniform1i(animSpriteShaderProgram.getUniform("horizontalFlip").getLocation(), (horizontalFlip) ? GL11.GL_TRUE:GL11.GL_FALSE);
+
+
 		GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, flatPlane.getNumVertices());
 	}
 
@@ -124,10 +114,10 @@ public class RenderSystem {
 		
 		Matrix4f finalMatrix = camera.getProjectionMatrix().multiply(camera.getWorldMatrix().multiply(component.getParentObject().getTransform().toMatrix()));
 		
-		GL20.glUniformMatrix4fv(spriteShaderProgram.getUniforms()[0].getLocation(), false, finalMatrix.toBuffer());
-		GL20.glUniform1i(spriteShaderProgram.getUniforms()[1].getLocation(), (component.isHorizontallyFlipped()) ? GL11.GL_TRUE:GL11.GL_FALSE);
-		GL20.glUniform1i(spriteShaderProgram.getUniforms()[2].getLocation(), (component.isVerticallyFlipped()) ? GL11.GL_TRUE:GL11.GL_FALSE);
-		GL20.glUniform1i(spriteShaderProgram.getUniforms()[3].getLocation(), 0);
+		GL20.glUniformMatrix4fv(spriteShaderProgram.getUniform("mvpMatrix").getLocation(), false, finalMatrix.toBuffer());
+		GL20.glUniform1i(spriteShaderProgram.getUniform("horizontalFlip").getLocation(), (component.isHorizontallyFlipped()) ? GL11.GL_TRUE:GL11.GL_FALSE);
+		GL20.glUniform1i(spriteShaderProgram.getUniform("verticalFlip").getLocation(), (component.isVerticallyFlipped()) ? GL11.GL_TRUE:GL11.GL_FALSE);
+		GL20.glUniform1i(spriteShaderProgram.getUniform("sprite").getLocation(), 0);
 		
 		GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, flatPlane.getNumVertices());
 		
@@ -147,10 +137,11 @@ public class RenderSystem {
 			transform.setXScale(size);
 			transform.setYScale(size);
 			transform.setZScale(size);
-			Uniform[] uniforms = textShaderProgram.getUniforms();
-			GL20.glUniformMatrix4fv(uniforms[0].getLocation(), false, transform.toMatrix().toBuffer());
-			GL20.glUniform1i(uniforms[2].getLocation(), font.getCharacterMapping(text.charAt(i)));
-			GL20.glUniform1i(uniforms[1].getLocation(), 0);
+			
+			
+			GL20.glUniformMatrix4fv(textShaderProgram.getUniform("modelMatrix").getLocation(), false, transform.toMatrix().toBuffer());
+			GL20.glUniform1i(textShaderProgram.getUniform("letter").getLocation(), font.getCharacterMapping(text.charAt(i)));
+			GL20.glUniform1i(textShaderProgram.getUniform("diffuseTexture").getLocation(), 0);
 			GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, flatPlane.getNumVertices());
 		}
 		
