@@ -34,4 +34,8 @@ public class Camera {
 	public Matrix4f getProjectionMatrix() {
 		return projectionMatrix;
 	}
+	
+	public void setTransform(Transform transform) {
+		this.transform = transform;
+	}
 }

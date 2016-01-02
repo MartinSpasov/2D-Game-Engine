@@ -199,7 +199,7 @@ public class RenderSystem {
 			batch.clear();
 		}
 		for (AnimatorComponent animator : animators) {
-			render(animator.getParentObject(), animator.getCurrentFrame(), animator.getTexture(), Game.flip);
+			render(animator.getParentObject(), animator.getCurrentFrame(), animator.getTexture(), false);
 		}
 		animators.clear();
 	}
@@ -237,6 +237,10 @@ public class RenderSystem {
 		textShaderProgram.destroy();
 		spriteShaderProgram.destroy();
 		animSpriteShaderProgram.destroy();
+	}
+	
+	public Camera getCamera() {
+		return camera;
 	}
 	
 }

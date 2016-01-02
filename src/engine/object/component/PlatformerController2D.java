@@ -36,7 +36,7 @@ public class PlatformerController2D extends ObjectComponent implements KeyListen
 			if (action == GLFW.GLFW_PRESS) {
 				left = true;
 				stateComponent.changeState("WALKING");
-				Game.flip = true; // TODO remove after done testing
+				//GameD.flip = true; // TODO remove after done testing
 			}
 			else if (action == GLFW.GLFW_RELEASE) {
 				left = false;
@@ -50,7 +50,7 @@ public class PlatformerController2D extends ObjectComponent implements KeyListen
 			if (action == GLFW.GLFW_PRESS) {
 				right = true;
 				stateComponent.changeState("WALKING");
-				Game.flip = false; // TODO remove after done testing
+				//GameD.flip = false; // TODO remove after done testing
 			}
 			else if (action == GLFW.GLFW_RELEASE) {
 				right = false;
