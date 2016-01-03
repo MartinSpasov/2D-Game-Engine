@@ -44,6 +44,10 @@ public class AnimatorComponent extends ObjectComponent implements StateListener 
 		return texture;
 	}
 	
+	public Animation getCurrentAnimation() {
+		return currentAnimation;
+	}
+	
 	public boolean isHorizontallyFlipped() {
 		return horizontalFlip;
 	}

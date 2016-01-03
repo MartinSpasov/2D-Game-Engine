@@ -40,12 +40,14 @@ public class PlatformerController2D extends ObjectComponent implements KeyListen
 			if (action == GLFW.GLFW_PRESS) {
 				left = true;
 				stateComponent.changeState("WALKING");
+				animatorComponent.getCurrentAnimation().setPaused(false);
 				animatorComponent.setHorizontalFlip(true); // TODO remove after done testing
 			}
 			else if (action == GLFW.GLFW_RELEASE) {
 				left = false;
 				if (!right) {
 					stateComponent.changeState("IDLE");
+					animatorComponent.getCurrentAnimation().setPaused(true);
 				}
 			}
 		}
@@ -54,12 +56,14 @@ public class PlatformerController2D extends ObjectComponent implements KeyListen
 			if (action == GLFW.GLFW_PRESS) {
 				right = true;
 				stateComponent.changeState("WALKING");
+				animatorComponent.getCurrentAnimation().setPaused(false);
 				animatorComponent.setHorizontalFlip(false); // TODO remove after done testing
 			}
 			else if (action == GLFW.GLFW_RELEASE) {
 				right = false;
 				if (!left) {
 					stateComponent.changeState("IDLE");
+					animatorComponent.getCurrentAnimation().setPaused(true);
 				}
 			}
 		}

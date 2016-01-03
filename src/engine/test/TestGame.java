@@ -48,13 +48,11 @@ public class TestGame extends Game implements ButtonListener {
 		obj.getTransform().translate(1,0,-1);
 		texture2 = Resources.loadArrayTexture("megaman_sheet.png", 1, 3);
 		Animation animWalk = new Animation(new int[]{0,1,2}, new float[]{0.2f,0.2f,0.2f});
-		Animation animIdle = new Animation(new int[]{0}, new float[]{0.0f});
+		
+		animWalk.setPaused(true);
+		AnimatorComponent animComp = new AnimatorComponent(obj, "WALKING", animWalk, texture2);
 				
-		AnimatorComponent animComp = new AnimatorComponent(obj, "IDLE", animIdle, texture2);
-		animComp.addAnimation("WALKING", animWalk);
-				
-		StateComponent states = new StateComponent(obj, "IDLE");
-		states.registerListener(animComp);
+		StateComponent states = new StateComponent(obj, "WALKING");
 				
 		PlatformerController2D control = new PlatformerController2D(obj, states, animComp);
 		getInput().registerKeyListener(control);
