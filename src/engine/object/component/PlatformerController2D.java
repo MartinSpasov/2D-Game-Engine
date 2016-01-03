@@ -11,13 +11,17 @@ public class PlatformerController2D extends ObjectComponent implements KeyListen
 	public static final float SPEED = 3f;
 	
 	private StateComponent stateComponent;
+	
+	// Temporary addition to flip the sprite
+	private AnimatorComponent animatorComponent;
 
 	private boolean left;
 	private boolean right;
 	
-	public PlatformerController2D(GameObject parentObject, StateComponent stateComponent) {
+	public PlatformerController2D(GameObject parentObject, StateComponent stateComponent, AnimatorComponent animatorComponent) {
 		super(parentObject);
 		this.stateComponent = stateComponent;
+		this.animatorComponent = animatorComponent;
 	}
 
 	@Override
@@ -36,7 +40,7 @@ public class PlatformerController2D extends ObjectComponent implements KeyListen
 			if (action == GLFW.GLFW_PRESS) {
 				left = true;
 				stateComponent.changeState("WALKING");
-				//GameD.flip = true; // TODO remove after done testing
+				animatorComponent.setHorizontalFlip(true); // TODO remove after done testing
 			}
 			else if (action == GLFW.GLFW_RELEASE) {
 				left = false;
@@ -50,7 +54,7 @@ public class PlatformerController2D extends ObjectComponent implements KeyListen
 			if (action == GLFW.GLFW_PRESS) {
 				right = true;
 				stateComponent.changeState("WALKING");
-				//GameD.flip = false; // TODO remove after done testing
+				animatorComponent.setHorizontalFlip(false); // TODO remove after done testing
 			}
 			else if (action == GLFW.GLFW_RELEASE) {
 				right = false;

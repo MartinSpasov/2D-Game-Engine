@@ -1,4 +1,4 @@
-package engine.text;
+package engine.test;
 
 import org.lwjgl.glfw.GLFW;
 
@@ -15,6 +15,8 @@ public class ControllerComponent extends ObjectComponent implements KeyListener 
 	private boolean d;
 	private boolean q;
 	private boolean e;
+	private boolean ctrl;
+	private boolean space;
 	
 	public static final float SPEED = 3f;
 	
@@ -41,6 +43,12 @@ public class ControllerComponent extends ObjectComponent implements KeyListener 
 		}
 		if (e) {
 			getParentObject().getTransform().setZRot(getParentObject().getTransform().getZRot() - (SPEED * delta));
+		}
+		if (ctrl) {
+			getParentObject().getTransform().translate(0, -SPEED * delta, 0);
+		}
+		if (space) {
+			getParentObject().getTransform().translate(0, SPEED * delta, 0);
 		}
 	}
 	
@@ -95,6 +103,22 @@ public class ControllerComponent extends ObjectComponent implements KeyListener 
 			}
 			else if (action == GLFW.GLFW_RELEASE) {
 				e = false;
+			}
+		}
+		if (key == GLFW.GLFW_KEY_LEFT_CONTROL) {
+			if (action == GLFW.GLFW_PRESS) {
+				ctrl = true;
+			}
+			else if (action == GLFW.GLFW_RELEASE) {
+				ctrl = false;
+			}
+		}
+		if (key == GLFW.GLFW_KEY_SPACE) {
+			if (action == GLFW.GLFW_PRESS) {
+				space = true;
+			}
+			else if (action == GLFW.GLFW_RELEASE) {
+				space = false;
 			}
 		}
 

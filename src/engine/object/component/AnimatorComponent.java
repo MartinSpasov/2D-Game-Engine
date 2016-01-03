@@ -12,6 +12,7 @@ public class AnimatorComponent extends ObjectComponent implements StateListener 
 	private ArrayTexture texture;
 	private HashMap<String, Animation> animations;
 	private Animation currentAnimation;
+	private boolean horizontalFlip;
 	
 	public AnimatorComponent(GameObject parentObject, String currentState, Animation currentAnimation, ArrayTexture texture) {
 		super(parentObject);
@@ -41,6 +42,14 @@ public class AnimatorComponent extends ObjectComponent implements StateListener 
 	
 	public ArrayTexture getTexture() {
 		return texture;
+	}
+	
+	public boolean isHorizontallyFlipped() {
+		return horizontalFlip;
+	}
+	
+	public void setHorizontalFlip(boolean horizontalFlip) {
+		this.horizontalFlip = horizontalFlip;
 	}
 
 	@Override

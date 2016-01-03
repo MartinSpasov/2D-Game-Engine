@@ -6,14 +6,18 @@ import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.system.MemoryUtil;
 
-public class Window {
+public class Window extends GLFWWindowSizeCallback {
 	
 	private long id;
 	
 	private GLFWErrorCallback errorCallback;
-	private GLFWWindowSizeCallback sizeCallback;
+	
+	private int width;
+	private int height;
 	
 	public Window(String title, int width, int height) {
+		this.width = width;
+		this.height = height;
 		
 		errorCallback = GLFWErrorCallback.createPrint(System.err);
 		GLFW.glfwSetErrorCallback(errorCallback);
@@ -34,18 +38,19 @@ public class Window {
 		GLFW.glfwSwapInterval(1);
 		GLFW.glfwShowWindow(id);
 		
-		sizeCallback = new GLFWWindowSizeCallback() {
-			
-			@Override
-			public void invoke(long window, int width, int height) {
-				GL11.glViewport(0, 0, width, height);
-			}
-		};
-		GLFW.glfwSetWindowSizeCallback(id, sizeCallback);
+		GLFW.glfwSetWindowSizeCallback(id, this);
 	}
 	
 	public long getId() {
 		return id;
+	}
+	
+	public int getWidth() {
+		return width;
+	}
+	
+	public int getHeight() {
+		return height;
 	}
 	
 	public void setTitle(String title) {
@@ -58,7 +63,14 @@ public class Window {
 	
 	public void destroy() {
 		errorCallback.release();
-		sizeCallback.release();
+		release();
 		GLFW.glfwTerminate();
+	}
+
+	@Override
+	public void invoke(long window, int width, int height) {
+		GL11.glViewport(0, 0, width, height);
+		this.width = width;
+		this.height = height;
 	}
 }

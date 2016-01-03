@@ -35,6 +35,35 @@ public class Rectangle extends Shape {
 		return (getX() < rect.getX() + rect.getWidth() && getX() + width > rect.getX() && getY() < rect.getY() + rect.getHeight() && getY() + height > rect.getY());
 	}
 	
+	public boolean contains(float x, float y) {
+		// TODO check if this can be optimized
+//		if (x >= getX()) {
+//			System.out.println("YES");
+//		}
+//		else {
+//			System.out.println("NO");
+//		}
+//		if (x <= getX() + width) {
+//			System.out.println("YES");
+//		}
+//		else {
+//			System.out.println("NO");
+//		}
+//		if (y <= getY()) {
+//			System.out.println("YES");
+//		}
+//		else {
+//			System.out.println("NO");
+//		}
+//		if (y >= getY() - height) {
+//			System.out.println("YES");
+//		}
+//		else {
+//			System.out.println("NO");
+//		}
+		return ((x >= getX() && x <= getX() + width) && (y <= getY() && y >= getY() - height));
+	}
+	
 	@Override
 	public boolean equals(Object o) {		
 		if (o instanceof Rectangle) {

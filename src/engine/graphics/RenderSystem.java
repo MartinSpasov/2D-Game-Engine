@@ -21,12 +21,21 @@ import engine.object.GameObject;
 import engine.object.Transform;
 import engine.object.component.AnimatorComponent;
 import engine.object.component.SpriteComponent;
+import engine.physics.geometry.Rectangle;
 import engine.resource.Resources;
 
 public class RenderSystem {
 	
 	public static final float[] PLANE_VERTS = new float[]{-0.5f,0.5f,0.0f, -0.5f,-0.5f,0.0f, 0.5f,0.5f,0.f, 0.5f,0.5f,0.0f, -0.5f,-0.5f,0.0f, 0.5f,-0.5f, 0.0f};
 	public static final float[] PLANE_UV = new float[]{0.0f,0.0f,0.0f,1.0f,1.0f,0.0f,1.0f,0.0f,0.0f,1.0f,1.0f,1.0f};
+	public static final float[] PLANE_VERTS2 = new float[]{
+			-1f,1f,0.0f, 
+			-1f,-1f,0.0f, 
+			1f,1f,0.f, 
+			1f,1f,0.0f, 
+			-1f,-1f,0.0f, 
+			1f,-1f, 0.0f};
+	
 	public static final int MAX_BATCH_SIZE = 10000;
 	
 	private GLCapabilities capabilities;
@@ -37,8 +46,10 @@ public class RenderSystem {
 	private ShaderProgram textShaderProgram;
 	private ShaderProgram spriteShaderProgram;
 	private ShaderProgram animSpriteShaderProgram;
+	private ShaderProgram uiShaderProgram;
 	
 	private Mesh flatPlane;
+	private Mesh flatPlane2;
 	
 	private HashMap<Texture, MeshBatch> batches;
 	private ArrayList<AnimatorComponent> animators;
@@ -50,8 +61,10 @@ public class RenderSystem {
 		textShaderProgram = new ShaderProgram(Resources.loadText("text_vert.shader"), Resources.loadText("text_frag.shader"));
 		spriteShaderProgram = new ShaderProgram(Resources.loadText("default_vert.shader"), Resources.loadText("sprite_frag.shader"));
 		animSpriteShaderProgram = new ShaderProgram(Resources.loadText("default_vert.shader"), Resources.loadText("animsprite_frag.shader"));
+		uiShaderProgram = new ShaderProgram(Resources.loadText("ui_vert.shader"), Resources.loadText("ui_frag.shader"));
 		
 		flatPlane = new Mesh(Game.toBuffer(PLANE_VERTS), Game.toBuffer(PLANE_UV));
+		flatPlane2 = new Mesh(Game.toBuffer(PLANE_VERTS2), Game.toBuffer(PLANE_UV));
 		
 		animators = new ArrayList<AnimatorComponent>();
 		batches = new HashMap<Texture, MeshBatch>();
@@ -147,6 +160,24 @@ public class RenderSystem {
 		
 	}
 	
+	public void render(Rectangle rect, Color backgroundColor) {
+		GL20.glUseProgram(uiShaderProgram.getProgramId());
+		
+		// Remember to change this calculation when I change the size of the flatplane
+		//Matrix4f modelMatrix = Matrix4f.translation(rect.getX() + 0.25f, rect.getY() - 0.25f, 0).multiply(Matrix4f.scale(rect.getWidth(), rect.getHeight(), 0));
+		Matrix4f modelMatrix = Matrix4f.translation(rect.getX() + (rect.getWidth() / 2.0f), rect.getY() - (rect.getHeight() / 2.0f), 0).multiply(Matrix4f.scale(rect.getWidth() / 2.0f, rect.getHeight() / 2.0f, 1f));
+		//modelMatrix = Matrix4f.scale(rect.getWidth(), rect.getHeight(), 1).multiply(modelMatrix);
+		//modelMatrix = Matrix4f.translation(-0.25f, 0.25f, 0f).multiply(modelMatrix);
+		//modelMatrix = Matrix4f.translation(rect.getX() + 0.25f, rect.getY() - 0.25f, 0).multiply(modelMatrix);
+		
+		GL30.glBindVertexArray(flatPlane2.getVaoId());
+		
+		GL20.glUniformMatrix4fv(uiShaderProgram.getUniform("modelMatrix").getLocation(), false, modelMatrix.toBuffer());
+		GL20.glUniform4fv(uiShaderProgram.getUniform("backgroundColor").getLocation(), backgroundColor.toBuffer());
+		
+		GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, flatPlane.getNumVertices());
+	}
+	
 	public String getOpenGLVersion() {
 		return GL11.glGetString(GL11.GL_VERSION);
 	}
@@ -199,7 +230,7 @@ public class RenderSystem {
 			batch.clear();
 		}
 		for (AnimatorComponent animator : animators) {
-			render(animator.getParentObject(), animator.getCurrentFrame(), animator.getTexture(), false);
+			render(animator.getParentObject(), animator.getCurrentFrame(), animator.getTexture(), animator.isHorizontallyFlipped());
 		}
 		animators.clear();
 	}
@@ -237,6 +268,7 @@ public class RenderSystem {
 		textShaderProgram.destroy();
 		spriteShaderProgram.destroy();
 		animSpriteShaderProgram.destroy();
+		uiShaderProgram.destroy();
 	}
 	
 	public Camera getCamera() {

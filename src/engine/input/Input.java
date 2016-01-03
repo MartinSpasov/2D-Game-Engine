@@ -12,6 +12,10 @@ import engine.Window;
 
 public class Input {
 	
+	public static int CURSOR_NORMAL = GLFW.GLFW_CURSOR_NORMAL;
+	public static int CURSOR_DISABLED = GLFW.GLFW_CURSOR_DISABLED;
+	public static int CURSOR_HIDDEN = GLFW.GLFW_CURSOR_HIDDEN;
+	
 	private ArrayList<KeyListener> keyListeners;
 	private ArrayList<MouseButtonListener> mouseButtonListeners;
 	private ArrayList<MouseMovementListener> mouseMovementListeners;
@@ -22,7 +26,10 @@ public class Input {
 	private GLFWCursorPosCallback mouseMovementCallback;
 	private GLFWScrollCallback mouseScrollCallback;
 	
+	private Window window;
+	
 	public Input(Window window) {
+		this.window = window;
 		keyListeners = new ArrayList<KeyListener>();
 		mouseButtonListeners = new ArrayList<MouseButtonListener>();
 		mouseMovementListeners = new ArrayList<MouseMovementListener>();
@@ -89,6 +96,10 @@ public class Input {
 	
 	public void registerMouseScrollListener(MouseScrollListener listener) {
 		mouseScrollListeners.add(listener);
+	}
+	
+	public void setCursorMode(int mode) {
+		GLFW.glfwSetInputMode(window.getId(), GLFW.GLFW_CURSOR, mode);
 	}
 
 	public void destroy() {
