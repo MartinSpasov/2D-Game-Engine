@@ -24,6 +24,8 @@ public abstract class Game {
 	
 	private int fps;
 	
+	private boolean shutdown;
+	
 	public Game(String title, int width, int height) {
 		logger.log("Initializing subsystems.");
 		window = new Window(title, width, height);
@@ -49,7 +51,7 @@ public abstract class Game {
 		
 		double time1 = 0;
 		
-		while (GLFW.glfwWindowShouldClose(window.getId()) == GL11.GL_FALSE) {
+		while (GLFW.glfwWindowShouldClose(window.getId()) == GL11.GL_FALSE && !shutdown) {
 			currentTime = GLFW.glfwGetTime();
 			GLFW.glfwPollEvents();
 			
@@ -119,6 +121,10 @@ public abstract class Game {
 	
 	public int getFps() {
 		return fps;
+	}
+	
+	public void shutdown() {
+		shutdown = true;
 	}
 	
 	// TODO remove later

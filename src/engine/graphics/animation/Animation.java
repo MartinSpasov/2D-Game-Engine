@@ -6,6 +6,7 @@ public class Animation {
 	private float[] delays;
 	
 	private int currentFrameIndex;
+	private int currentFrame;
 	private float timeElapsed;
 	
 	private boolean paused;
@@ -13,6 +14,7 @@ public class Animation {
 	public Animation(int[] frames, float[] delays) {
 		this.frames = frames;
 		this.delays = delays;
+		currentFrame = frames[0];
 	}
 	
 	public void tick(float delta) {
@@ -20,8 +22,8 @@ public class Animation {
 			timeElapsed += delta;
 			if (timeElapsed >= delays[currentFrameIndex]) {
 				timeElapsed -= delays[currentFrameIndex];
-
-				currentFrameIndex++;
+				
+				currentFrame = frames[currentFrameIndex++];
 				if (currentFrameIndex >= frames.length) {
 					currentFrameIndex = 0;
 				}
@@ -35,10 +37,15 @@ public class Animation {
 	
 	public void reset() {
 		currentFrameIndex = 0;
+		currentFrame = frames[0];
 		timeElapsed = 0;
 	}
 	
+	public void setCurrentFrame(int currentFrame) {
+		this.currentFrame = currentFrame;
+	}
+	
 	public int getCurrentFrame() {
-		return frames[currentFrameIndex];
+		return currentFrame;
 	}
 }

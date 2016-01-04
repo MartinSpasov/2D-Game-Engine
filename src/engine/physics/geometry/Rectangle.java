@@ -32,36 +32,15 @@ public class Rectangle extends Shape {
 	}
 	
 	public boolean intersects(Rectangle rect) {
+		// FIXME considers x and y to be the top left corner of the origin
 		return (getX() < rect.getX() + rect.getWidth() && getX() + width > rect.getX() && getY() < rect.getY() + rect.getHeight() && getY() + height > rect.getY());
 	}
 	
 	public boolean contains(float x, float y) {
-		// TODO check if this can be optimized
-//		if (x >= getX()) {
-//			System.out.println("YES");
-//		}
-//		else {
-//			System.out.println("NO");
-//		}
-//		if (x <= getX() + width) {
-//			System.out.println("YES");
-//		}
-//		else {
-//			System.out.println("NO");
-//		}
-//		if (y <= getY()) {
-//			System.out.println("YES");
-//		}
-//		else {
-//			System.out.println("NO");
-//		}
-//		if (y >= getY() - height) {
-//			System.out.println("YES");
-//		}
-//		else {
-//			System.out.println("NO");
-//		}
-		return ((x >= getX() && x <= getX() + width) && (y <= getY() && y >= getY() - height));
+		float topLeftX = getX() - (width / 2.0f);
+		float topLeftY = getY() + (height / 2.0f);
+		
+		return ((x >= topLeftX && x <= topLeftX + width) && (y <= topLeftY && y >= topLeftY - height));
 	}
 	
 	@Override

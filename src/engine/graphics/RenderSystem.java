@@ -13,6 +13,7 @@ import org.lwjgl.opengl.GL45;
 import org.lwjgl.opengl.GLCapabilities;
 
 import engine.Game;
+import engine.Tile;
 import engine.console.Logger;
 import engine.graphics.shader.ShaderProgram;
 import engine.graphics.text.Font;
@@ -28,13 +29,14 @@ public class RenderSystem {
 	
 	public static final float[] PLANE_VERTS = new float[]{-0.5f,0.5f,0.0f, -0.5f,-0.5f,0.0f, 0.5f,0.5f,0.f, 0.5f,0.5f,0.0f, -0.5f,-0.5f,0.0f, 0.5f,-0.5f, 0.0f};
 	public static final float[] PLANE_UV = new float[]{0.0f,0.0f,0.0f,1.0f,1.0f,0.0f,1.0f,0.0f,0.0f,1.0f,1.0f,1.0f};
-	public static final float[] PLANE_VERTS2 = new float[]{
-			-1f,1f,0.0f, 
-			-1f,-1f,0.0f, 
-			1f,1f,0.f, 
-			1f,1f,0.0f, 
-			-1f,-1f,0.0f, 
-			1f,-1f, 0.0f};
+
+	public static final float[] PLANE_VERTS_TOP_LEFT = new float[]{
+			0.0f,0.0f,0.0f, 
+			0.0f,-1.0f,0.0f, 
+			1.0f,0.0f,0.0f, 
+			1.0f,0.0f,0.0f, 
+			0.0f,-1.0f,0.0f, 
+			1.0f,-1.0f, 0.0f};
 	
 	public static final int MAX_BATCH_SIZE = 10000;
 	
@@ -47,9 +49,9 @@ public class RenderSystem {
 	private ShaderProgram spriteShaderProgram;
 	private ShaderProgram animSpriteShaderProgram;
 	private ShaderProgram uiShaderProgram;
+	private ShaderProgram tileShaderProgram;
 	
 	private Mesh flatPlane;
-	private Mesh flatPlane2;
 	
 	private HashMap<Texture, MeshBatch> batches;
 	private ArrayList<AnimatorComponent> animators;
@@ -57,14 +59,14 @@ public class RenderSystem {
 	public RenderSystem(Camera camera) {
 		this.camera = camera;
 		capabilities = GL.createCapabilities();
-		instanceShaderProgram = new ShaderProgram(Resources.loadText("instance_vert.shader"), Resources.loadText("instance_frag.shader"));
-		textShaderProgram = new ShaderProgram(Resources.loadText("text_vert.shader"), Resources.loadText("text_frag.shader"));
-		spriteShaderProgram = new ShaderProgram(Resources.loadText("default_vert.shader"), Resources.loadText("sprite_frag.shader"));
-		animSpriteShaderProgram = new ShaderProgram(Resources.loadText("default_vert.shader"), Resources.loadText("animsprite_frag.shader"));
-		uiShaderProgram = new ShaderProgram(Resources.loadText("ui_vert.shader"), Resources.loadText("ui_frag.shader"));
+		instanceShaderProgram = new ShaderProgram(Resources.loadText("shader/instance_vert.shader"), Resources.loadText("shader/instance_frag.shader"));
+		textShaderProgram = new ShaderProgram(Resources.loadText("shader/text_vert.shader"), Resources.loadText("shader/text_frag.shader"));
+		spriteShaderProgram = new ShaderProgram(Resources.loadText("shader/default_vert.shader"), Resources.loadText("shader/sprite_frag.shader"));
+		animSpriteShaderProgram = new ShaderProgram(Resources.loadText("shader/default_vert.shader"), Resources.loadText("shader/animsprite_frag.shader"));
+		uiShaderProgram = new ShaderProgram(Resources.loadText("shader/ui_vert.shader"), Resources.loadText("shader/ui_frag.shader"));
+		tileShaderProgram = new ShaderProgram(Resources.loadText("shader/tile_vert.shader"), Resources.loadText("shader/tile_frag.shader"));
 		
 		flatPlane = new Mesh(Game.toBuffer(PLANE_VERTS), Game.toBuffer(PLANE_UV));
-		flatPlane2 = new Mesh(Game.toBuffer(PLANE_VERTS2), Game.toBuffer(PLANE_UV));
 		
 		animators = new ArrayList<AnimatorComponent>();
 		batches = new HashMap<Texture, MeshBatch>();
@@ -160,17 +162,31 @@ public class RenderSystem {
 		
 	}
 	
+	public void renderLevel(ArrayList<Tile> tiles, ArrayTexture texture) {
+		GL20.glUseProgram(tileShaderProgram.getProgramId());
+		GL30.glBindVertexArray(flatPlane.getVaoId());
+		
+		GL13.glActiveTexture(GL13.GL_TEXTURE0);
+		GL11.glBindTexture(GL30.GL_TEXTURE_2D_ARRAY, texture.getTextureId());
+		
+		for (Tile tile : tiles) {
+			Transform transform = new Transform(tile.getX(), tile.getY(), 0);
+			Matrix4f finalMatrix = camera.getProjectionMatrix().multiply(camera.getWorldMatrix().multiply(transform.toMatrix()));
+			
+			GL20.glUniformMatrix4fv(tileShaderProgram.getUniform("mvpMatrix").getLocation(), false, finalMatrix.toBuffer());
+			GL20.glUniform1i(tileShaderProgram.getUniform("index").getLocation(), tile.getIndex());
+			GL20.glUniform1i(tileShaderProgram.getUniform("diffuseTexture").getLocation(), 0);
+			GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, flatPlane.getNumVertices());
+		}
+	}
+	
 	public void render(Rectangle rect, Color backgroundColor) {
 		GL20.glUseProgram(uiShaderProgram.getProgramId());
 		
 		// Remember to change this calculation when I change the size of the flatplane
-		//Matrix4f modelMatrix = Matrix4f.translation(rect.getX() + 0.25f, rect.getY() - 0.25f, 0).multiply(Matrix4f.scale(rect.getWidth(), rect.getHeight(), 0));
-		Matrix4f modelMatrix = Matrix4f.translation(rect.getX() + (rect.getWidth() / 2.0f), rect.getY() - (rect.getHeight() / 2.0f), 0).multiply(Matrix4f.scale(rect.getWidth() / 2.0f, rect.getHeight() / 2.0f, 1f));
-		//modelMatrix = Matrix4f.scale(rect.getWidth(), rect.getHeight(), 1).multiply(modelMatrix);
-		//modelMatrix = Matrix4f.translation(-0.25f, 0.25f, 0f).multiply(modelMatrix);
-		//modelMatrix = Matrix4f.translation(rect.getX() + 0.25f, rect.getY() - 0.25f, 0).multiply(modelMatrix);
-		
-		GL30.glBindVertexArray(flatPlane2.getVaoId());
+		Matrix4f modelMatrix = Matrix4f.translation(rect.getX(), rect.getY(), 0).multiply(Matrix4f.scale(rect.getWidth(), rect.getHeight(), 1f));
+
+		GL30.glBindVertexArray(flatPlane.getVaoId());
 		
 		GL20.glUniformMatrix4fv(uiShaderProgram.getUniform("modelMatrix").getLocation(), false, modelMatrix.toBuffer());
 		GL20.glUniform4fv(uiShaderProgram.getUniform("backgroundColor").getLocation(), backgroundColor.toBuffer());
