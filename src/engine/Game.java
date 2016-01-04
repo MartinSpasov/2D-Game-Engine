@@ -31,6 +31,7 @@ public abstract class Game {
 		window = new Window(title, width, height);
 		
 		renderSystem = new RenderSystem(new Camera(Matrix4f.perspective(-1, 1, 1, -1, 1, 1000)));
+		//renderSystem = new RenderSystem(new Camera(Matrix4f.orthographic(-8, 8, 4.5f, -4.5f, 1, 1000))); // 16 x 9 game units
 		logger.log(renderSystem.getOpenGLVersion());
 		
 		input = new Input(window);

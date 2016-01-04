@@ -231,11 +231,11 @@ public class Matrix4f {
 	}
 
 	public static Matrix4f perspective(float l, float r, float t, float b, float n, float f) {
-		// FIXME Something is not correct with this matrix
+
 		return new Matrix4f(new float[]{
-				(2 * n) / (r - l),0,(r + l) / (r - l),0,
-				0,(2 * n) / (t - b),(t + b) / (t - b),0,
-				0,0,(-1 * (f + n))/(f - n),(-2 * f * n)/(f - n),
+				(2f * n) / (r - l),0,(r + l) / (r - l),0,
+				0,(2f * n) / (t - b),(t + b) / (t - b),0,
+				0,0,(-1 * (f + n))/(f - n),(-2f * f * n)/(f - n),
 				0,0,-1,0
 		});
 	}
@@ -243,9 +243,9 @@ public class Matrix4f {
 	public static Matrix4f orthographic(float l, float r, float t, float b, float n, float f) {
 		
 		return new Matrix4f(new float[]{
-				1 / r, 0, 0, 0,
-				0, 1 / t, 0, 0,
-				0, 0, -2/(f - n),-1 * ((f + n)/(f - n)),
+				2f / (r -l), 0, 0, ((r + l)/(r - l)) * -1,
+				0, 2f / (t - b), 0, ((t + b)/(t - b)) * -1,
+				0, 0, -2f/(f - n),-1 * ((f + n)/(f - n)),
 				0,0,0,1	
 		});
 	}

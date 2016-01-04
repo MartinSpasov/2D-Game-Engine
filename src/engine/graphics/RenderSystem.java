@@ -3,14 +3,18 @@ package engine.graphics;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL31;
+import org.lwjgl.opengl.GL43;
 import org.lwjgl.opengl.GL45;
 import org.lwjgl.opengl.GLCapabilities;
+import org.lwjgl.opengl.GLDebugMessageCallback;
+import org.lwjgl.system.MemoryUtil;
 
 import engine.Game;
 import engine.Tile;
@@ -59,6 +63,37 @@ public class RenderSystem {
 	public RenderSystem(Camera camera) {
 		this.camera = camera;
 		capabilities = GL.createCapabilities();
+		
+		GL43.glDebugMessageCallback(new GLDebugMessageCallback() {
+			
+			@Override
+			public void invoke(int source, int type, int id, int severity, int length, long message, long userParam) {
+				String decodedMessage = MemoryUtil.memDecodeUTF8(MemoryUtil.memByteBuffer(message, length));
+				String decodedSeverity;
+				
+				switch(severity) {
+				case GL43.GL_DEBUG_SEVERITY_LOW:
+					decodedSeverity = "LOW";
+					break;
+				case GL43.GL_DEBUG_SEVERITY_MEDIUM:
+					decodedSeverity = "MEDIUM";
+					break;
+				case GL43.GL_DEBUG_SEVERITY_HIGH:
+					decodedSeverity = "HIGH";
+					break;
+				case GL43.GL_DEBUG_SEVERITY_NOTIFICATION:
+					decodedSeverity = "NOTIFY";
+					break;
+				default:
+					decodedSeverity = "";
+				}
+				
+				Game.logger.log("[" + decodedSeverity +  "] " + decodedMessage);
+			}
+			
+		}, 0);
+		GL43.glDebugMessageControl(GL11.GL_DONT_CARE, GL11.GL_DONT_CARE, GL11.GL_DONT_CARE, 0, BufferUtils.createByteBuffer(0), true);
+		
 		instanceShaderProgram = new ShaderProgram(Resources.loadText("shader/instance_vert.shader"), Resources.loadText("shader/instance_frag.shader"));
 		textShaderProgram = new ShaderProgram(Resources.loadText("shader/text_vert.shader"), Resources.loadText("shader/text_frag.shader"));
 		spriteShaderProgram = new ShaderProgram(Resources.loadText("shader/default_vert.shader"), Resources.loadText("shader/sprite_frag.shader"));
@@ -73,6 +108,8 @@ public class RenderSystem {
 		
 		GL11.glClearColor(0.0f, 51/255.0f, 153/255.0f, 1.0f);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		
+		GL43.glDebugMessageInsert(GL43.GL_DEBUG_SOURCE_APPLICATION, GL43.GL_DEBUG_TYPE_OTHER, 1, GL43.GL_DEBUG_SEVERITY_NOTIFICATION, "This is a test message!");
 		//GL11.glEnable(GL11.GL_BLEND);
 		//GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		

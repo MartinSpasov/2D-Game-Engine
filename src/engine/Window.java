@@ -27,6 +27,10 @@ public class Window extends GLFWWindowSizeCallback {
 		}
 		
 		GLFW.glfwDefaultWindowHints();
+		
+		// OpenGL debug context
+		GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_DEBUG_CONTEXT, GL11.GL_TRUE);
+		
 		id = GLFW.glfwCreateWindow(width, height, title, MemoryUtil.NULL, MemoryUtil.NULL);
 		if (id == MemoryUtil.NULL) {
 			throw new RuntimeException("Failed to create window");
