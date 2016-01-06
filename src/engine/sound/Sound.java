@@ -8,9 +8,9 @@ public class Sound {
 
 	private int bufferId;
 	
-	public Sound(ShortBuffer data, int frequency) {
+	public Sound(ShortBuffer data, int sampleRate) {
 		bufferId = AL10.alGenBuffers();
-		AL10.alBufferData(bufferId, AL10.AL_FORMAT_MONO16, data, frequency);
+		AL10.alBufferData(bufferId, AL10.AL_FORMAT_MONO16, data, sampleRate);
 	}
 	
 	public int getBufferId() {

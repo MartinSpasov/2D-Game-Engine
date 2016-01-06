@@ -8,12 +8,21 @@ public class Font {
 
 	private ArrayTexture glyphs;
 	private HashMap<Character, Integer> characterMap;
-	private int defaultCharacter;
+	private int invalidCharacter;
 	
-	public Font(ArrayTexture glyphs, int defaultCharacter) {
+	private float glyphWidth;
+	private float glyphHeight;
+	
+	public Font(ArrayTexture glyphs, int invalidCharacter, float glyphWidth, float glyphHeight) {
+		this(glyphs, invalidCharacter, glyphWidth, glyphHeight, new HashMap<Character, Integer>());
+	}
+	
+	public Font(ArrayTexture glyphs, int invalidCharacter, float glyphWidth, float glyphHeight, HashMap<Character, Integer> characterMap) {
 		this.glyphs = glyphs;
-		this.defaultCharacter = defaultCharacter;
-		characterMap = new HashMap<Character, Integer>();
+		this.invalidCharacter = invalidCharacter;
+		this.characterMap = characterMap;
+		this.glyphWidth = glyphWidth;
+		this.glyphHeight = glyphHeight;
 	}
 	
 	public ArrayTexture getGlyphs() {
@@ -28,11 +37,19 @@ public class Font {
 		Integer i = characterMap.get(c);
 		
 		if (i == null) {
-			return defaultCharacter;
+			return invalidCharacter;
 		}
 		else {
 			return i;
 		}
+	}
+	
+	public float getGlyphWidth() {
+		return glyphWidth;
+	}
+	
+	public float getGlyphHeight() {
+		return glyphHeight;
 	}
 	
 	public void destroy() {

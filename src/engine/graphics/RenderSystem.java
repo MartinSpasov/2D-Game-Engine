@@ -175,7 +175,7 @@ public class RenderSystem {
 		
 	}
 	
-	public void renderText(String text, Font font, float x, float y) {
+	public void renderText(String text, Font font, float x, float y, Color color) {
 		
 		GL20.glUseProgram(textShaderProgram.getProgramId());
 		GL30.glBindVertexArray(flatPlane.getVaoId());
@@ -183,17 +183,18 @@ public class RenderSystem {
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
 		GL11.glBindTexture(GL30.GL_TEXTURE_2D_ARRAY, font.getGlyphs().getTextureId());
 		
-		float size = 0.1f;
+		//float size = 0.1f;
 		for (int i = 0; i < text.length(); i++) {
-			Transform transform = new Transform(x + (i * size),y,0);
-			transform.setXScale(size);
-			transform.setYScale(size);
-			transform.setZScale(size);
+			Transform transform = new Transform(x + (i * font.getGlyphWidth()),y,0);
+			transform.setXScale(font.getGlyphWidth());
+			transform.setYScale(font.getGlyphHeight());
+			//transform.setZScale(size);
 			
 			
 			GL20.glUniformMatrix4fv(textShaderProgram.getUniform("modelMatrix").getLocation(), false, transform.toMatrix().toBuffer());
 			GL20.glUniform1i(textShaderProgram.getUniform("letter").getLocation(), font.getCharacterMapping(text.charAt(i)));
 			GL20.glUniform1i(textShaderProgram.getUniform("diffuseTexture").getLocation(), 0);
+			//GL20.glUniform4fv(textShaderProgram.getUniform("textColor").getLocation(), color.toBuffer());
 			GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, flatPlane.getNumVertices());
 		}
 		

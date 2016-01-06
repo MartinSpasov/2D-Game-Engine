@@ -19,8 +19,10 @@ import org.lwjgl.stb.STBImage;
 import org.lwjgl.stb.STBVorbis;
 
 import engine.Tile;
+import engine.Window;
 import engine.graphics.ArrayTexture;
 import engine.graphics.Texture;
+import engine.graphics.text.Font;
 import engine.sound.Sound;
 
 public class Resources {
@@ -45,7 +47,7 @@ public class Resources {
 		return string.toString();
 	}
 	
-	public static  ArrayTexture loadArrayTexture(String file, int rows, int columns) {
+	public static  ArrayTexture loadArrayTexture(String file, int rows, int columns, int filtering) {
 		ByteBuffer buffer = null;
 		int width = 0;
 		int height = 0;
@@ -80,16 +82,16 @@ public class Resources {
 			e.printStackTrace();
 		}
 		
-		return new ArrayTexture(buffer, width, height, depth);
+		return new ArrayTexture(buffer, width, height, depth, filtering);
 	}
 	
-	public static Texture loadTexture(String fileName) {
+	public static Texture loadTexture(String fileName, int filtering) {
 		IntBuffer width = BufferUtils.createIntBuffer(1);
 		IntBuffer height = BufferUtils.createIntBuffer(1);
 		IntBuffer channels = BufferUtils.createIntBuffer(1);
 		ByteBuffer data = STBImage.stbi_load(PATH + "texture/" + fileName, width, height, channels, 4);
 		
-		return new Texture(data, width.get(0), height.get(0));
+		return new Texture(data, width.get(0), height.get(0), filtering);
 	}
 	
 	public static Sound loadSound(String fileName) {
@@ -98,6 +100,74 @@ public class Resources {
 		ShortBuffer data = STBVorbis.stb_vorbis_decode_filename(PATH + "sound/" + fileName, channels, sampleRate);
 		
 		return new Sound(data, sampleRate.get(0));
+	}
+	
+	public static Font loadFont(String fontAtlas, String fontDesc, int width, int height, Window window) {
+		IntBuffer imageWidth = BufferUtils.createIntBuffer(1);
+		IntBuffer imageHeight = BufferUtils.createIntBuffer(1);
+		IntBuffer channels = BufferUtils.createIntBuffer(1);
+		ByteBuffer data = STBImage.stbi_load(PATH + "font/" + fontAtlas, imageWidth, imageHeight, channels, 4);
+		
+		HashMap<Character, Integer> characterMap = new HashMap<Character, Integer>();
+		int invalidCharacter = 0;
+		int charCount = 0;
+		ByteBuffer newData = null;
+		
+		try {
+			Scanner input = new Scanner(new File(PATH + "font/" + fontDesc));
+			
+			// Ignore first 3 lines for now
+			input.nextLine();
+			input.nextLine();
+			input.nextLine();
+			
+			String[] countLine = input.nextLine().split("\\s+");
+			charCount = Integer.parseInt(countLine[1].substring(6));
+			newData = BufferUtils.createByteBuffer(charCount * width * height * channels.get(0));
+			
+			int index = 0;
+			while(input.hasNextLine()) {			
+				String[] line = input.nextLine().split("\\s+");
+
+				
+				int asciiCode = Integer.parseInt(line[1].substring(3));
+				
+				if (asciiCode == -1) {
+					invalidCharacter = index;
+				}
+				
+				characterMap.put((char)asciiCode, index++);
+				
+				int x = Integer.parseInt(line[2].substring(2));
+				int y = Integer.parseInt(line[3].substring(2));
+				
+				for (int y2 = 0; y2 < height; y2++) {
+					for (int x2 = 0; x2 < width; x2++) {
+						int offset = ((x + x2) * 4) + ((y + y2) * 4 * imageWidth.get(0));
+						newData.put(data.get(offset));
+						newData.put(data.get(offset + 1));
+						newData.put(data.get(offset + 2));
+						newData.put(data.get(offset + 3));
+						
+					}
+				}
+
+			}
+			
+			input.close();
+		} 
+		catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		newData.flip();
+
+		float glyphWidth = (2.0f / window.getWidth()) * width;
+		float glyphHeight = (2.0f / window.getHeight()) * height;
+		
+		System.out.println(glyphWidth);
+		System.out.println(glyphHeight);
+		
+		return new Font(new ArrayTexture(newData, width, height, charCount, Texture.LINEAR), invalidCharacter, glyphWidth, glyphHeight, characterMap);
 	}
 	
 	public static ArrayList<Tile> loadLevel(String map, String keys) {
