@@ -190,7 +190,6 @@ public class RenderSystem {
 			transform.setYScale(font.getGlyphHeight());
 			//transform.setZScale(size);
 			
-			
 			GL20.glUniformMatrix4fv(textShaderProgram.getUniform("modelMatrix").getLocation(), false, transform.toMatrix().toBuffer());
 			GL20.glUniform1i(textShaderProgram.getUniform("letter").getLocation(), font.getCharacterMapping(text.charAt(i)));
 			GL20.glUniform1i(textShaderProgram.getUniform("diffuseTexture").getLocation(), 0);

@@ -12,7 +12,7 @@ void main() {
 	
 	vec4 textureColor = texture(diffuseTexture, vec3(textureCoord.x, textureCoord.y, letter));
 	
-	if (textureColor.rgba == vec4(0.0,0.0,0.0,1.0)) {
+	if (textureColor.rgb == vec3(0.0,0.0,0.0)) {
 		discard;
 	}
 	

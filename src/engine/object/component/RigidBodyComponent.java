@@ -44,4 +44,10 @@ public class RigidBodyComponent extends ObjectComponent {
 		
 	}
 
+	@Override
+	public <T> void receiveMessage(String message, T param) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

@@ -22,4 +22,10 @@ public class ColliderComponent extends ObjectComponent {
 		shape.setY(t.getYPos());
 	}
 
+	@Override
+	public <T> void receiveMessage(String message, T param) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

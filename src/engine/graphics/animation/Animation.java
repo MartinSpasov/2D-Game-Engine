@@ -23,10 +23,13 @@ public class Animation {
 			if (timeElapsed >= delays[currentFrameIndex]) {
 				timeElapsed -= delays[currentFrameIndex];
 				
-				currentFrame = frames[currentFrameIndex++];
+				currentFrameIndex++;
+				
 				if (currentFrameIndex >= frames.length) {
 					currentFrameIndex = 0;
 				}
+				
+				currentFrame = frames[currentFrameIndex];
 			} 
 		}
 	}

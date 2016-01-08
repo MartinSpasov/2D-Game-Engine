@@ -7,7 +7,7 @@ import engine.graphics.ArrayTexture;
 import engine.graphics.animation.Animation;
 import engine.object.GameObject;
 
-public class AnimatorComponent extends ObjectComponent implements StateListener {
+public class AnimatorComponent extends ObjectComponent {
 	
 	private ArrayTexture texture;
 	private HashMap<String, Animation> animations;
@@ -57,14 +57,31 @@ public class AnimatorComponent extends ObjectComponent implements StateListener 
 	}
 
 	@Override
-	public void receiveStateChange(String state) {
-		changeState(state);
-	}
-
-	@Override
 	public void tick(float delta, Game game) {
 		currentAnimation.tick(delta);
 		game.getRenderSystem().addAnimatorComponent(this);
 	}
+
+	@Override
+	public <T> void receiveMessage(String message, T param) {
+		if (message.equals("STATECHANGE") && param instanceof String) {
+			if (animations.containsKey((String)param)) {
+				changeState((String)param);
+			}
+		}
+		else if (message.equals("PAUSEANIM") && param instanceof Boolean) {
+			currentAnimation.setPaused((boolean)param);
+		}
+		else if (message.equals("RESETANIM")) {
+			currentAnimation.reset();
+		}
+		else if (message.equals("FLIPSPRITE") && param instanceof Boolean) {
+			horizontalFlip = (boolean)param;
+		}
+		else if (message.equals("SETCURRENTFRAME") && param instanceof Integer) {
+			currentAnimation.setCurrentFrame(0);
+		}
+	}
+
 
 }

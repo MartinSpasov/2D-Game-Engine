@@ -35,10 +35,10 @@ public class Button extends UserInterfaceComponent {
 	public void tick(float delta, Game game) {
 		game.getRenderSystem().render(getBounds(), getBackgroundColor());
 		
-		//float fontX = getBounds().getX() + (getBounds().getWidth() / 2.0f);
-		//float fontY = getBounds().getY() - (getBounds().getHeight() / 2.0f);
+		float fontX = getBounds().getX() + (getBounds().getWidth() / 2.0f);
+		float fontY = getBounds().getY() - (getBounds().getHeight() / 2.0f);
 		
-		//game.getRenderSystem().renderText(text, font, getBounds().getX(), getBounds().getY(), textColor);
+		game.getRenderSystem().renderText(text, font, getBounds().getX(), getBounds().getY(), textColor);
 	}
 
 	@Override

@@ -16,4 +16,5 @@ abstract public class ObjectComponent {
 	}
 	
 	public abstract void tick(float delta, Game game);
+	public abstract <T> void receiveMessage(String message, T param);
 }

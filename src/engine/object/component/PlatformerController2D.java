@@ -9,19 +9,12 @@ import engine.object.GameObject;
 public class PlatformerController2D extends ObjectComponent implements KeyListener {
 
 	public static final float SPEED = 3f;
-	
-	private StateComponent stateComponent;
-	
-	// Temporary addition to flip the sprite
-	private AnimatorComponent animatorComponent;
 
 	private boolean left;
 	private boolean right;
 	
-	public PlatformerController2D(GameObject parentObject, StateComponent stateComponent, AnimatorComponent animatorComponent) {
+	public PlatformerController2D(GameObject parentObject) {
 		super(parentObject);
-		this.stateComponent = stateComponent;
-		this.animatorComponent = animatorComponent;
 	}
 
 	@Override
@@ -39,17 +32,17 @@ public class PlatformerController2D extends ObjectComponent implements KeyListen
 		if (key == GLFW.GLFW_KEY_LEFT) {
 			if (action == GLFW.GLFW_PRESS) {
 				left = true;
-				stateComponent.changeState("WALKING");
-				animatorComponent.getCurrentAnimation().setPaused(false);
-				animatorComponent.getCurrentAnimation().reset();
-				animatorComponent.setHorizontalFlip(true);
+				getParentObject().broadcastMessage("STATECHANGE", "WALKING");
+				getParentObject().broadcastMessage("PAUSEANIM", false);
+				getParentObject().broadcastMessage("RESETANIM", null);
+				getParentObject().broadcastMessage("FLIPSPRITE", true);
 			}
 			else if (action == GLFW.GLFW_RELEASE) {
 				left = false;
 				if (!right) {
-					stateComponent.changeState("IDLE");
-					animatorComponent.getCurrentAnimation().setPaused(true);
-					animatorComponent.getCurrentAnimation().setCurrentFrame(0);
+					getParentObject().broadcastMessage("STATECHANGE", "IDLE");
+					getParentObject().broadcastMessage("PAUSEANIM", true);
+					getParentObject().broadcastMessage("SETCURRENTFRAME", 0);
 				}
 			}
 		}
@@ -57,20 +50,27 @@ public class PlatformerController2D extends ObjectComponent implements KeyListen
 		if (key == GLFW.GLFW_KEY_RIGHT) {
 			if (action == GLFW.GLFW_PRESS) {
 				right = true;
-				stateComponent.changeState("WALKING");
-				animatorComponent.getCurrentAnimation().setPaused(false);
-				animatorComponent.getCurrentAnimation().reset();
-				animatorComponent.setHorizontalFlip(false);
+				getParentObject().broadcastMessage("STATECHANGE", "WALKING");
+				getParentObject().broadcastMessage("PAUSEANIM", false);
+				getParentObject().broadcastMessage("RESETANIM", null);
+				getParentObject().broadcastMessage("FLIPSPRITE", false);
 			}
 			else if (action == GLFW.GLFW_RELEASE) {
 				right = false;
 				if (!left) {
-					stateComponent.changeState("IDLE");
-					animatorComponent.getCurrentAnimation().setPaused(true);
-					animatorComponent.getCurrentAnimation().setCurrentFrame(0);
+					getParentObject().broadcastMessage("STATECHANGE", "IDLE");
+					getParentObject().broadcastMessage("PAUSEANIM", true);
+					getParentObject().broadcastMessage("SETCURRENTFRAME", 0);
 				}
 			}
 		}
 	}
+
+	@Override
+	public <T> void receiveMessage(String message, T param) {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 }

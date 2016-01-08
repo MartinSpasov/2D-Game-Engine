@@ -34,6 +34,12 @@ public class GameObject {
 	public void addComponent(ObjectComponent component) {
 		components.add(component);
 	}
+	
+	public <T> void broadcastMessage(String message, T param) {
+		for (ObjectComponent component : components) {
+			component.receiveMessage(message, param);
+		}
+	}
 
 	public Transform getTransform() {
 		return transform;

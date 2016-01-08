@@ -39,4 +39,11 @@ public class SpriteComponent extends ObjectComponent {
 	public void tick(float delta, Game game) {
 		game.getRenderSystem().addSpriteComponent(this);
 	}
+
+	@Override
+	public <T> void receiveMessage(String message, T param) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
