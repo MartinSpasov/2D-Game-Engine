@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import engine.Game;
 import engine.Tile;
 import engine.graphics.ArrayTexture;
+import engine.graphics.Background;
 import engine.graphics.Color;
 import engine.graphics.Texture;
 import engine.graphics.animation.Animation;
@@ -15,6 +16,7 @@ import engine.graphics.ui.component.ButtonListener;
 import engine.object.GameObject;
 import engine.object.component.AnimatorComponent;
 import engine.object.component.PlatformerController2D;
+import engine.object.component.RigidBodyComponent;
 import engine.object.component.SpriteComponent;
 import engine.object.component.StateComponent;
 import engine.physics.geometry.Rectangle;
@@ -27,6 +29,7 @@ public class TestGame extends Game implements ButtonListener {
 	private ArrayTexture mapTexture;
 	
 	private UserInterface ui;
+	private Background background;
 	
 	private ArrayList<Tile> tiles;
 	
@@ -71,6 +74,7 @@ public class TestGame extends Game implements ButtonListener {
 		obj.addComponent(animComp);
 		obj.addComponent(states);
 		obj.addComponent(control);
+		obj.addComponent(new RigidBodyComponent(obj, 65));
 				
 		getScene().addObject(obj);
 		
@@ -91,13 +95,16 @@ public class TestGame extends Game implements ButtonListener {
 		mapTexture = Resources.loadArrayTexture("lava_level.png", 5, 4, Texture.NEAREST_NEIGHBOR);
 		tiles = Resources.loadLevel("map.png", "map.txt");
 
-		font = Resources.loadFont("font1.png", "font1.fnt", 19, 32, getWindow());
+		font = Resources.loadFont("font2.png", "font2.fnt", 19, 32, getWindow());
 		
 		Button button = new Button(new Rectangle(0.0f, -0.45f, 0.5f, 0.15f), "Test", font);
 		button.setTextColor(Color.GREEN);
 		button.registerButtonListener(this);
 		button.setBackgroundColor(Color.RED);
 		ui.addUserInterfaceComponent(button);
+		
+		background = new Background(Resources.loadTexture("background.png", Texture.NEAREST_NEIGHBOR));
+		getRenderSystem().addBackground(background);
 
 	}
 	
@@ -109,6 +116,13 @@ public class TestGame extends Game implements ButtonListener {
 		texture2.destroy();
 		mapTexture.destroy();
 		font.destroy();
+		background.destroy();
+	}
+	
+	@Override
+	public void tick(float delta) {
+		super.tick(delta);
+		background.setXOffset(background.getXOffset() + 0.001f);
 	}
 	
 	// Temporary override

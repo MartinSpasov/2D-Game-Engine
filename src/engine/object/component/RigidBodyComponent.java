@@ -40,14 +40,44 @@ public class RigidBodyComponent extends ObjectComponent {
 
 	@Override
 	public void tick(float delta, Game game) {
-		// TODO Auto-generated method stub
+		// Apply gravity
+		applyForce(new Vector3f(0, G * mass, 0));
+		acceleration = netForce.divide(mass);
+	
+		netForce.x = 0;
+		netForce.y = 0;
+		netForce.z = 0;
 		
+		Vector3f vF = velocity.add(acceleration.multiply(delta));
+		Vector3f displacement = velocity.add(vF).divide(2.0f).multiply(delta);
+
+		getParentObject().getTransform().translate(displacement.x, displacement.y, displacement.z);
+		velocity = vF;
+
+		// Inertia for flat plane
+		int height = 1;
+		int width = 1;
+		float inertia = mass * ((height * height) + (width * width)) / 12.0f;
+		
+		angularAcceleration = netTorque / inertia;
+		netTorque = 0;
+		
+		float avF = (angularVelocity + (angularAcceleration * delta));
+		float aDisplacement = ((angularVelocity + avF) / 2.0f) * delta;
+		
+		angularVelocity = avF;
+		
+		getParentObject().getTransform().setZRot(getParentObject().getTransform().getZRot() + aDisplacement);
 	}
 
 	@Override
 	public <T> void receiveMessage(String message, T param) {
-		// TODO Auto-generated method stub
-		
+		if (message.equals("APPLYFORCE") && param instanceof Vector3f) {
+			applyForce((Vector3f)param);
+		}
+		if (message.equals("APPLYTORQUE") && param instanceof Float) {
+			applyTorque((float)param);
+		}
 	}
 
 }

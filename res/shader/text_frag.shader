@@ -10,12 +10,12 @@ uniform vec4 textColor;
 
 void main() {
 	
-	vec4 textureColor = texture(diffuseTexture, vec3(textureCoord.x, textureCoord.y, letter));
+	float textureAlpha = texture(diffuseTexture, vec3(textureCoord.x, textureCoord.y, letter)).a;
 	
-	if (textureColor.rgb == vec3(0.0,0.0,0.0)) {
+	if (textureAlpha == 0) {
 		discard;
 	}
 	
-	color = textureColor;
-	//color = textColor;
+	//color = textureColor;
+	color = vec4(textColor.rgb, textureAlpha);
 }

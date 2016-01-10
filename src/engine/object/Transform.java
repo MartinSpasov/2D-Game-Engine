@@ -1,6 +1,7 @@
 package engine.object;
 
 import engine.math.Matrix4f;
+import engine.math.Vector3f;
 
 public class Transform {
 
@@ -48,6 +49,11 @@ public class Transform {
 		xPos += dx;
 		yPos += dy;
 		zPos += dz;
+	}
+	
+	public void translateLocal(float dx, float dy, float dz) {
+		Vector3f displacement = new Vector3f(dx,dy,dz).rotate(xRot, Vector3f.X_AXIS).rotate(yRot, Vector3f.Y_AXIS).rotate(zRot, Vector3f.Z_AXIS);
+		translate(displacement.x, displacement.y, displacement.z);
 	}
 	
 	public void scale(float scale) {

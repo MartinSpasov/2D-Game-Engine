@@ -163,10 +163,7 @@ public class Resources {
 
 		float glyphWidth = (2.0f / window.getWidth()) * width;
 		float glyphHeight = (2.0f / window.getHeight()) * height;
-		
-		System.out.println(glyphWidth);
-		System.out.println(glyphHeight);
-		
+
 		return new Font(new ArrayTexture(newData, width, height, charCount, Texture.LINEAR), invalidCharacter, glyphWidth, glyphHeight, characterMap);
 	}
 	

@@ -45,6 +45,7 @@ public class RenderSystem {
 	public static final int MAX_BATCH_SIZE = 10000;
 	
 	private GLCapabilities capabilities;
+	private GLDebugMessageCallback debugCallback;
 	
 	private Camera camera;
 	
@@ -54,17 +55,20 @@ public class RenderSystem {
 	private ShaderProgram animSpriteShaderProgram;
 	private ShaderProgram uiShaderProgram;
 	private ShaderProgram tileShaderProgram;
+	private ShaderProgram bgShaderProgram;
 	
 	private Mesh flatPlane;
 	
 	private HashMap<Texture, MeshBatch> batches;
 	private ArrayList<AnimatorComponent> animators;
 	
+	private ArrayList<Background> backgrounds;
+	
 	public RenderSystem(Camera camera) {
 		this.camera = camera;
 		capabilities = GL.createCapabilities();
 		
-		GL43.glDebugMessageCallback(new GLDebugMessageCallback() {
+		debugCallback = new GLDebugMessageCallback() {
 			
 			@Override
 			public void invoke(int source, int type, int id, int severity, int length, long message, long userParam) {
@@ -91,7 +95,8 @@ public class RenderSystem {
 				Game.logger.log("[" + decodedSeverity +  "] " + decodedMessage);
 			}
 			
-		}, 0);
+		};
+		GL43.glDebugMessageCallback(debugCallback, 0);
 		GL43.glDebugMessageControl(GL11.GL_DONT_CARE, GL11.GL_DONT_CARE, GL11.GL_DONT_CARE, 0, BufferUtils.createByteBuffer(0), true);
 		
 		instanceShaderProgram = new ShaderProgram(Resources.loadText("shader/instance_vert.shader"), Resources.loadText("shader/instance_frag.shader"));
@@ -100,18 +105,20 @@ public class RenderSystem {
 		animSpriteShaderProgram = new ShaderProgram(Resources.loadText("shader/default_vert.shader"), Resources.loadText("shader/animsprite_frag.shader"));
 		uiShaderProgram = new ShaderProgram(Resources.loadText("shader/ui_vert.shader"), Resources.loadText("shader/ui_frag.shader"));
 		tileShaderProgram = new ShaderProgram(Resources.loadText("shader/tile_vert.shader"), Resources.loadText("shader/tile_frag.shader"));
+		bgShaderProgram = new ShaderProgram(Resources.loadText("shader/bg_vert.shader"), Resources.loadText("shader/bg_frag.shader"));
 		
 		flatPlane = new Mesh(Game.toBuffer(PLANE_VERTS), Game.toBuffer(PLANE_UV));
 		
 		animators = new ArrayList<AnimatorComponent>();
 		batches = new HashMap<Texture, MeshBatch>();
+		backgrounds = new ArrayList<Background>();
 		
 		GL11.glClearColor(0.0f, 51/255.0f, 153/255.0f, 1.0f);
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		//GL11.glEnable(GL11.GL_DEPTH_TEST);
 		
 		GL43.glDebugMessageInsert(GL43.GL_DEBUG_SOURCE_APPLICATION, GL43.GL_DEBUG_TYPE_OTHER, 1, GL43.GL_DEBUG_SEVERITY_NOTIFICATION, "This is a test message!");
-		//GL11.glEnable(GL11.GL_BLEND);
-		//GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		
 		//GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
 		
@@ -193,7 +200,7 @@ public class RenderSystem {
 			GL20.glUniformMatrix4fv(textShaderProgram.getUniform("modelMatrix").getLocation(), false, transform.toMatrix().toBuffer());
 			GL20.glUniform1i(textShaderProgram.getUniform("letter").getLocation(), font.getCharacterMapping(text.charAt(i)));
 			GL20.glUniform1i(textShaderProgram.getUniform("diffuseTexture").getLocation(), 0);
-			//GL20.glUniform4fv(textShaderProgram.getUniform("textColor").getLocation(), color.toBuffer());
+			GL20.glUniform4fv(textShaderProgram.getUniform("textColor").getLocation(), color.toBuffer());
 			GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, flatPlane.getNumVertices());
 		}
 		
@@ -231,6 +238,21 @@ public class RenderSystem {
 		GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, flatPlane.getNumVertices());
 	}
 	
+	public void renderBackground(Background background) {
+		GL20.glUseProgram(bgShaderProgram.getProgramId());
+		
+		GL30.glBindVertexArray(flatPlane.getVaoId());
+		
+		GL13.glActiveTexture(GL13.GL_TEXTURE0);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, background.getTexture().getTextureId());
+		
+		GL20.glUniformMatrix4fv(bgShaderProgram.getUniform("modelMatrix").getLocation(), false, Matrix4f.scale(2, 2, 1).toBuffer());
+		GL20.glUniform1i(bgShaderProgram.getUniform("diffuseTexture").getLocation(), 0);
+		GL20.glUniform1f(bgShaderProgram.getUniform("xOffset").getLocation(), background.getXOffset());
+		
+		GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, flatPlane.getNumVertices());
+	}
+	
 	public String getOpenGLVersion() {
 		return GL11.glGetString(GL11.GL_VERSION);
 	}
@@ -239,6 +261,7 @@ public class RenderSystem {
 		return capabilities;
 	}
 	
+	@Deprecated
 	public boolean checkError(Logger logger) {
 		int error = 0;
 		
@@ -277,6 +300,9 @@ public class RenderSystem {
 	}
 	
 	public void renderAll() {
+		for (Background bg : backgrounds) {
+			renderBackground(bg);
+		}
 		for (Texture sprite : batches.keySet()) {
 			MeshBatch batch = batches.get(sprite);
 			render(batch);
@@ -302,6 +328,10 @@ public class RenderSystem {
 	
 	public void addAnimatorComponent(AnimatorComponent component) {
 		animators.add(component);
+	}
+	
+	public void addBackground(Background background) {
+		backgrounds.add(background);
 	}
 	
 	public void setBackgroundColor(float r, float g, float b, float a) {

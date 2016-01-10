@@ -12,6 +12,8 @@ public class PlatformerController2D extends ObjectComponent implements KeyListen
 
 	private boolean left;
 	private boolean right;
+	private boolean leftShift;
+	private boolean rightShift;
 	
 	public PlatformerController2D(GameObject parentObject) {
 		super(parentObject);
@@ -20,10 +22,16 @@ public class PlatformerController2D extends ObjectComponent implements KeyListen
 	@Override
 	public void tick(float delta, Game game) {
 		if (left) {
-			getParentObject().getTransform().translate(-SPEED * delta, 0, 0);
+			getParentObject().getTransform().translateLocal(-SPEED * delta, 0, 0);
 		}
 		if (right) {
-			getParentObject().getTransform().translate(SPEED * delta, 0, 0);
+			getParentObject().getTransform().translateLocal(SPEED * delta, 0, 0);
+		}
+		if (leftShift) {
+			getParentObject().broadcastMessage("APPLYTORQUE", 50f);
+		}
+		if (rightShift) {
+			getParentObject().broadcastMessage("APPLYTORQUE", -50f);
 		}
 	}
 
@@ -62,6 +70,22 @@ public class PlatformerController2D extends ObjectComponent implements KeyListen
 					getParentObject().broadcastMessage("PAUSEANIM", true);
 					getParentObject().broadcastMessage("SETCURRENTFRAME", 0);
 				}
+			}
+		}
+		if (key == GLFW.GLFW_KEY_LEFT_SHIFT) {
+			if (action == GLFW.GLFW_PRESS) {
+				leftShift = true;
+			}
+			else if (action == GLFW.GLFW_RELEASE) {
+				leftShift = false;
+			}
+		}
+		if (key == GLFW.GLFW_KEY_RIGHT_SHIFT) {
+			if (action == GLFW.GLFW_PRESS) {
+				rightShift = true;
+			}
+			else if (action == GLFW.GLFW_RELEASE) {
+				rightShift = false;
 			}
 		}
 	}
