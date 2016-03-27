@@ -44,6 +44,11 @@ public class Rectangle extends Shape {
 	}
 	
 	@Override
+	public String toString() {
+		return "x: " + getX() + " y: " + getY() + " width: " + width + " height: " + height;
+	}
+	
+	@Override
 	public boolean equals(Object o) {		
 		if (o instanceof Rectangle) {
 			Rectangle rect = (Rectangle) o;

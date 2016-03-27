@@ -15,6 +15,7 @@ import engine.graphics.ui.component.Button;
 import engine.graphics.ui.component.ButtonListener;
 import engine.object.GameObject;
 import engine.object.component.AnimatorComponent;
+import engine.object.component.ColliderComponent;
 import engine.object.component.PlatformerController2D;
 import engine.object.component.RigidBodyComponent;
 import engine.object.component.SpriteComponent;
@@ -32,6 +33,7 @@ public class TestGame extends Game implements ButtonListener {
 	private Background background;
 	
 	private ArrayList<Tile> tiles;
+	private ArrayList<Rectangle> collision;
 	
 	private Font font;
 
@@ -57,7 +59,7 @@ public class TestGame extends Game implements ButtonListener {
 		}
 				
 		GameObject obj = new GameObject();
-		obj.getTransform().translate(1,0,-1);
+		//obj.getTransform().translate(1,0,-1);
 		texture2 = Resources.loadArrayTexture("megaman_sheet.png", 1, 4, Texture.NEAREST_NEIGHBOR);
 		Animation animWalk = new Animation(new int[]{1,2,3}, new float[]{0.16f,0.16f,0.16f});
 		//Animation animWalk = new Animation(new int[]{1,2,3}, new float[]{1f,1f,1f});
@@ -75,8 +77,15 @@ public class TestGame extends Game implements ButtonListener {
 		obj.addComponent(states);
 		obj.addComponent(control);
 		obj.addComponent(new RigidBodyComponent(obj, 65));
-				
+		obj.addComponent(new ColliderComponent(obj, new Rectangle(1,1)));		
+		obj.getTransform().translate(4, -10, 0);
 		getScene().addObject(obj);
+		
+		GameObject obj2 = new GameObject();
+		obj2.getTransform().translate(-5, 0, -1);
+		obj2.addComponent(new SpriteComponent(obj2, texture));
+		obj2.addComponent(new ColliderComponent(obj2, new Rectangle(1,1)));
+		getScene().addObject(obj2);
 		
 		GameObject cameraObject = new GameObject();
 		ControllerComponent cameraControl = new ControllerComponent(cameraObject);
@@ -105,6 +114,10 @@ public class TestGame extends Game implements ButtonListener {
 		
 		background = new Background(Resources.loadTexture("background.png", Texture.NEAREST_NEIGHBOR));
 		getRenderSystem().addBackground(background);
+		
+		collision = new ArrayList<Rectangle>();
+		collision.add(new Rectangle(0,-5f,1f,800f));
+		getCollisionSystem().addStaticCollider(collision.get(0));
 
 	}
 	

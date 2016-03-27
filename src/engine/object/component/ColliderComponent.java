@@ -20,12 +20,24 @@ public class ColliderComponent extends ObjectComponent {
 		
 		shape.setX(t.getXPos());
 		shape.setY(t.getYPos());
+		
+		game.getCollisionSystem().addCollider(this);
 	}
 
 	@Override
 	public <T> void receiveMessage(String message, T param) {
-		// TODO Auto-generated method stub
-		
+		if (message.equals("COLLISION") && param instanceof ColliderComponent) {
+			ColliderComponent other = (ColliderComponent) param;
+			
+			float dx = shape.getX() - other.getShape().getX();
+			float dy = shape.getY() - other.getShape().getY();
+			
+			//System.out.println("DX: " + dx + " DY: " + dy);
+		}
+	}
+	
+	public Shape getShape() {
+		return shape;
 	}
 
 }

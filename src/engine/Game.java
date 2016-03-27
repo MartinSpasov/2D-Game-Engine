@@ -11,6 +11,7 @@ import engine.graphics.Camera;
 import engine.graphics.RenderSystem;
 import engine.input.Input;
 import engine.math.Matrix4f;
+import engine.physics.collision.CollisionSystem;
 import engine.sound.SoundSystem;
 
 public abstract class Game {
@@ -20,6 +21,7 @@ public abstract class Game {
 	private SoundSystem soundSystem;
 	private Window window;
 	private Scene scene;
+	private CollisionSystem collisionSystem;
 	public static Logger logger = new Logger(System.out); // TODO change later
 	
 	private int fps;
@@ -30,8 +32,8 @@ public abstract class Game {
 		logger.log("Initializing subsystems.");
 		window = new Window(title, width, height);
 		
-		renderSystem = new RenderSystem(new Camera(Matrix4f.perspective(-1, 1, 1, -1, 1, 1000)));
-		//renderSystem = new RenderSystem(new Camera(Matrix4f.orthographic(-8, 8, 4.5f, -4.5f, 1, 1000))); // 16 x 9 game units
+		//renderSystem = new RenderSystem(new Camera(Matrix4f.perspective(-1, 1, 1, -1, 1, 1000)));
+		renderSystem = new RenderSystem(new Camera(Matrix4f.orthographic(-8, 8, 4.5f, -4.5f, 1, 1000))); // 16 x 9 game units
 		logger.log(renderSystem.getOpenGLVersion());
 		
 		input = new Input(window);
@@ -39,6 +41,7 @@ public abstract class Game {
 		
 		logger.log("Loading scene.");
 		scene = new Scene();
+		collisionSystem = new CollisionSystem();
 	}
 	
 	public void run() {
@@ -85,6 +88,7 @@ public abstract class Game {
 	
 	public void tick(float delta) {
 		scene.tick(delta, this);
+		collisionSystem.narrowScan();
 	}
 	
 	public void render() {
@@ -118,6 +122,10 @@ public abstract class Game {
 	
 	public Window getWindow() {
 		return window;
+	}
+	
+	public CollisionSystem getCollisionSystem() {
+		return collisionSystem;
 	}
 	
 	public int getFps() {

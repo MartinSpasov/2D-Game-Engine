@@ -92,8 +92,10 @@ public class PlatformerController2D extends ObjectComponent implements KeyListen
 
 	@Override
 	public <T> void receiveMessage(String message, T param) {
-		// TODO Auto-generated method stub
-		
+		if (message.equals("COLLISION")) {
+			left = false;
+			right = false;
+		}
 	}
 
 
