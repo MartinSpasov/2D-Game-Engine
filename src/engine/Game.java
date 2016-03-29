@@ -32,8 +32,8 @@ public abstract class Game {
 		logger.log("Initializing subsystems.");
 		window = new Window(title, width, height);
 		
-		//renderSystem = new RenderSystem(new Camera(Matrix4f.perspective(-1, 1, 1, -1, 1, 1000)));
-		renderSystem = new RenderSystem(new Camera(Matrix4f.orthographic(-8, 8, 4.5f, -4.5f, 1, 1000))); // 16 x 9 game units
+		renderSystem = new RenderSystem(new Camera(Matrix4f.perspective(-1, 1, 1, -1, 1, 1000)));
+		//renderSystem = new RenderSystem(new Camera(Matrix4f.orthographic(-8, 8, 4.5f, -4.5f, 1, 1000))); // 16 x 9 game units
 		logger.log(renderSystem.getOpenGLVersion());
 		
 		input = new Input(window);
@@ -92,7 +92,7 @@ public abstract class Game {
 	}
 	
 	public void render() {
-		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+		//GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 		renderSystem.renderAll();
 		//renderSystem.checkError(logger);
 	}

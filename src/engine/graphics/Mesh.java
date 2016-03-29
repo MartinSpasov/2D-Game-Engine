@@ -1,54 +1,39 @@
 package engine.graphics;
+
 import java.nio.FloatBuffer;
 
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL15;
-import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.GL30;
+
+import engine.graphics.memory.VertexArrayObject;
 
 public class Mesh {
 	
-	private int vaoId;
-	private int vertBufferId;
-	private int uvBufferId;
+	private VertexArrayObject vao;
 	
 	private int numVertices;
 
 	public Mesh(FloatBuffer vertices, FloatBuffer uvCoords) {
-		numVertices = vertices.capacity();
+		numVertices = vertices.capacity() / 3; // FIXME At the moment this assumes that 3 values will be provided for each vertex
 		
-		vaoId = GL30.glGenVertexArrays();
-		GL30.glBindVertexArray(vaoId);
+		vao = new VertexArrayObject();
 		
-		vertBufferId = GL15.glGenBuffers();
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vertBufferId);
-		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, vertices, GL15.GL_STATIC_DRAW);
+		vao.bind();
 		
-		GL20.glEnableVertexAttribArray(0);
-		GL20.glVertexAttribPointer(0, 3, GL11.GL_FLOAT, false, 0, 0);
+		vao.addArrayBuffer(0, vertices, 3, GL11.GL_FLOAT);
+		vao.addArrayBuffer(1, uvCoords, 2, GL11.GL_FLOAT);
 		
-		uvBufferId = GL15.glGenBuffers();
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, uvBufferId);
-		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, uvCoords, GL15.GL_STATIC_DRAW);
-		
-		GL20.glEnableVertexAttribArray(1);
-		GL20.glVertexAttribPointer(1, 2, GL11.GL_FLOAT, false, 0, 0);
-		
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-		GL30.glBindVertexArray(0);
+		vao.unbind();
 	}
 	
 	public int getNumVertices() {
 		return numVertices;
 	}
 	
-	public int getVaoId() {
-		return vaoId;
+	public VertexArrayObject getVertexArrayObject() {
+		return vao;
 	}
 	
 	public void destroy() {
-		GL15.glDeleteBuffers(vertBufferId);
-		GL15.glDeleteBuffers(uvBufferId);
-		GL30.glDeleteVertexArrays(vaoId);
+		vao.destroy();
 	}
 }

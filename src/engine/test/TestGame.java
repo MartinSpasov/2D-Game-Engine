@@ -2,40 +2,36 @@ package engine.test;
 
 import java.util.ArrayList;
 
+import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.GL11;
+
 import engine.Game;
 import engine.Tile;
-import engine.graphics.ArrayTexture;
-import engine.graphics.Background;
 import engine.graphics.Color;
 import engine.graphics.Texture;
-import engine.graphics.animation.Animation;
 import engine.graphics.text.Font;
-import engine.graphics.ui.UserInterface;
-import engine.graphics.ui.component.Button;
-import engine.graphics.ui.component.ButtonListener;
+import engine.input.KeyListener;
 import engine.object.GameObject;
-import engine.object.component.AnimatorComponent;
-import engine.object.component.ColliderComponent;
-import engine.object.component.PlatformerController2D;
-import engine.object.component.RigidBodyComponent;
 import engine.object.component.SpriteComponent;
-import engine.object.component.StateComponent;
 import engine.physics.geometry.Rectangle;
 import engine.resource.Resources;
+import engine.sound.Sound;
 
-public class TestGame extends Game implements ButtonListener {
-	
-	private Texture texture;
-	private ArrayTexture texture2;
-	private ArrayTexture mapTexture;
-	
-	private UserInterface ui;
-	private Background background;
+public class TestGame extends Game implements KeyListener {
 	
 	private ArrayList<Tile> tiles;
 	private ArrayList<Rectangle> collision;
 	
 	private Font font;
+	
+	private Texture earthboundTileset;
+	
+	private Ness ness;
+	private Texture nessSprite;
+	
+	private Texture test;
+	
+	private Sound testSound;
 
 	public static void main(String[] args) {
 		new TestGame().run();
@@ -47,45 +43,6 @@ public class TestGame extends Game implements ButtonListener {
 
 	@Override
 	public void init() {
-		// Texture
-		texture = Resources.loadTexture("megaman.png", Texture.NEAREST_NEIGHBOR);
-				
-		for (int i = 0; i < 1000; i++) {
-			GameObject obj = new GameObject();
-			SpriteComponent comp = new SpriteComponent(obj, texture);
-			obj.addComponent(comp);
-			obj.getTransform().translate(0, 0, -i);
-			getScene().addObject(obj);
-		}
-				
-		GameObject obj = new GameObject();
-		//obj.getTransform().translate(1,0,-1);
-		texture2 = Resources.loadArrayTexture("megaman_sheet.png", 1, 4, Texture.NEAREST_NEIGHBOR);
-		Animation animWalk = new Animation(new int[]{1,2,3}, new float[]{0.16f,0.16f,0.16f});
-		//Animation animWalk = new Animation(new int[]{1,2,3}, new float[]{1f,1f,1f});
-		
-		animWalk.setPaused(true);
-		animWalk.setCurrentFrame(0);
-		AnimatorComponent animComp = new AnimatorComponent(obj, "WALKING", animWalk, texture2);
-				
-		StateComponent states = new StateComponent(obj, "WALKING");
-				
-		PlatformerController2D control = new PlatformerController2D(obj);
-		getInput().registerKeyListener(control);
-				
-		obj.addComponent(animComp);
-		obj.addComponent(states);
-		obj.addComponent(control);
-		obj.addComponent(new RigidBodyComponent(obj, 65));
-		obj.addComponent(new ColliderComponent(obj, new Rectangle(1,1)));		
-		obj.getTransform().translate(4, -10, 0);
-		getScene().addObject(obj);
-		
-		GameObject obj2 = new GameObject();
-		obj2.getTransform().translate(-5, 0, -1);
-		obj2.addComponent(new SpriteComponent(obj2, texture));
-		obj2.addComponent(new ColliderComponent(obj2, new Rectangle(1,1)));
-		getScene().addObject(obj2);
 		
 		GameObject cameraObject = new GameObject();
 		ControllerComponent cameraControl = new ControllerComponent(cameraObject);
@@ -96,70 +53,64 @@ public class TestGame extends Game implements ButtonListener {
 		
 		getRenderSystem().getCamera().setTransform(cameraObject.getTransform());
 		cameraObject.getTransform().setZPos(3);
+
+		testSound = Resources.loadSound("attack1.ogg");
 		
-		ui = new UserInterface(this);
-		getInput().registerMouseButtonListener(ui);
-		getInput().registerMouseMovementListener(ui);
+		nessSprite = Resources.loadArrayTexture("ness.png", 2, 4, Texture.NEAREST_NEIGHBOR);
+		ness = new Ness(getInput(), nessSprite);
+		getScene().addObject(ness);
 		
-		mapTexture = Resources.loadArrayTexture("lava_level.png", 5, 4, Texture.NEAREST_NEIGHBOR);
-		tiles = Resources.loadLevel("map.png", "map.txt");
+		earthboundTileset = Resources.loadArrayTexture("earthbound.png", 53, 16, Texture.NEAREST_NEIGHBOR);
+		tiles = Resources.loadLevel("map2.png", "map2.txt");
 
 		font = Resources.loadFont("font2.png", "font2.fnt", 19, 32, getWindow());
-		
-		Button button = new Button(new Rectangle(0.0f, -0.45f, 0.5f, 0.15f), "Test", font);
-		button.setTextColor(Color.GREEN);
-		button.registerButtonListener(this);
-		button.setBackgroundColor(Color.RED);
-		ui.addUserInterfaceComponent(button);
-		
-		background = new Background(Resources.loadTexture("background.png", Texture.NEAREST_NEIGHBOR));
-		getRenderSystem().addBackground(background);
 		
 		collision = new ArrayList<Rectangle>();
 		collision.add(new Rectangle(0,-5f,1f,800f));
 		getCollisionSystem().addStaticCollider(collision.get(0));
+		
+		getInput().registerKeyListener(this);
+		
+		test = Resources.loadTexture("megaman.png", Texture.NEAREST_NEIGHBOR);
+		GameObject obj = new GameObject();
+		obj.addComponent(new SpriteComponent(obj, test));
+		getScene().addObject(obj);
 
+	}
+	
+	
+	@Override
+	public void tick(float delta) {
+		super.tick(delta);
+		getSoundSystem().checkError(Game.logger);
 	}
 	
 	// Temporary override
 	@Override
 	public void destroy() {
-		super.destroy();
-		texture.destroy();
-		texture2.destroy();
-		mapTexture.destroy();
+		nessSprite.destroy();
+		earthboundTileset.destroy();
 		font.destroy();
-		background.destroy();
-	}
-	
-	@Override
-	public void tick(float delta) {
-		super.tick(delta);
-		background.setXOffset(background.getXOffset() + 0.001f);
+		testSound.destroy();
+		test.destroy();
+		super.destroy();
 	}
 	
 	// Temporary override
 	@Override
 	public void render() {
+		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+		getRenderSystem().renderLevel(tiles, earthboundTileset);
 		super.render();
-		getRenderSystem().renderLevel(tiles, mapTexture);
-		ui.tick(0.16f);
+		//getRenderSystem().renderDebugRectangles(tiles, Color.WHITE);
 		getRenderSystem().renderText("FPS: " + getFps(), font, -0.92f, 0.92f, Color.WHITE);
 	}
 
-	private boolean toggled = false;
-	
 	@Override
-	public void onPress(Button button) {
-		if (toggled) {
-			button.setBackgroundColor(Color.RED);
-			button.setTextColor(Color.GREEN);
+	public void onKey(long window, int key, int scancode, int action, int mods) {
+		if (key == GLFW.GLFW_KEY_LEFT_ALT && action == GLFW.GLFW_PRESS) {
+			getSoundSystem().playSound(testSound);
 		}
-		else {
-			button.setBackgroundColor(Color.GREEN);
-			button.setTextColor(Color.RED);
-		}
-		toggled = !toggled;
 	}
 
 }

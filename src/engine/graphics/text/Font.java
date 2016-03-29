@@ -2,22 +2,22 @@ package engine.graphics.text;
 
 import java.util.HashMap;
 
-import engine.graphics.ArrayTexture;
+import engine.graphics.Texture;
 
 public class Font {
 
-	private ArrayTexture glyphs;
+	private Texture glyphs;
 	private HashMap<Character, Integer> characterMap;
 	private int invalidCharacter;
 	
 	private float glyphWidth;
 	private float glyphHeight;
 	
-	public Font(ArrayTexture glyphs, int invalidCharacter, float glyphWidth, float glyphHeight) {
+	public Font(Texture glyphs, int invalidCharacter, float glyphWidth, float glyphHeight) {
 		this(glyphs, invalidCharacter, glyphWidth, glyphHeight, new HashMap<Character, Integer>());
 	}
 	
-	public Font(ArrayTexture glyphs, int invalidCharacter, float glyphWidth, float glyphHeight, HashMap<Character, Integer> characterMap) {
+	public Font(Texture glyphs, int invalidCharacter, float glyphWidth, float glyphHeight, HashMap<Character, Integer> characterMap) {
 		this.glyphs = glyphs;
 		this.invalidCharacter = invalidCharacter;
 		this.characterMap = characterMap;
@@ -25,7 +25,7 @@ public class Font {
 		this.glyphHeight = glyphHeight;
 	}
 	
-	public ArrayTexture getGlyphs() {
+	public Texture getGlyphs() {
 		return glyphs;
 	}
 	

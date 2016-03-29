@@ -20,7 +20,6 @@ import org.lwjgl.stb.STBVorbis;
 
 import engine.Tile;
 import engine.Window;
-import engine.graphics.ArrayTexture;
 import engine.graphics.Texture;
 import engine.graphics.text.Font;
 import engine.sound.Sound;
@@ -47,7 +46,7 @@ public class Resources {
 		return string.toString();
 	}
 	
-	public static  ArrayTexture loadArrayTexture(String file, int rows, int columns, int filtering) {
+	public static Texture loadArrayTexture(String file, int rows, int columns, int filtering) {
 		ByteBuffer buffer = null;
 		int width = 0;
 		int height = 0;
@@ -82,7 +81,12 @@ public class Resources {
 			e.printStackTrace();
 		}
 		
-		return new ArrayTexture(buffer, width, height, depth, filtering);
+		Texture texture = new Texture(Texture.TEXTURE_2D_ARRAY);
+		texture.bind();
+		texture.bufferTexture3D(buffer, width, height, depth, filtering);
+		texture.unbind();
+		
+		return texture;
 	}
 	
 	public static Texture loadTexture(String fileName, int filtering) {
@@ -91,7 +95,12 @@ public class Resources {
 		IntBuffer channels = BufferUtils.createIntBuffer(1);
 		ByteBuffer data = STBImage.stbi_load(PATH + "texture/" + fileName, width, height, channels, 4);
 		
-		return new Texture(data, width.get(0), height.get(0), filtering);
+		Texture texture = new Texture(Texture.TEXTURE_2D);
+		texture.bind();
+		texture.bufferTexture2D(data, width.get(0), height.get(0), filtering);
+		texture.unbind();
+		
+		return texture;
 	}
 	
 	public static Sound loadSound(String fileName) {
@@ -164,7 +173,13 @@ public class Resources {
 		float glyphWidth = (2.0f / window.getWidth()) * width;
 		float glyphHeight = (2.0f / window.getHeight()) * height;
 
-		return new Font(new ArrayTexture(newData, width, height, charCount, Texture.LINEAR), invalidCharacter, glyphWidth, glyphHeight, characterMap);
+		
+		Texture texture = new Texture(Texture.TEXTURE_2D_ARRAY);
+		texture.bind();
+		texture.bufferTexture3D(newData, width, height, charCount, Texture.LINEAR);
+		texture.unbind();
+		
+		return new Font(texture, invalidCharacter, glyphWidth, glyphHeight, characterMap);
 	}
 	
 	public static ArrayList<Tile> loadLevel(String map, String keys) {

@@ -3,18 +3,18 @@ package engine.object.component;
 import java.util.HashMap;
 
 import engine.Game;
-import engine.graphics.ArrayTexture;
+import engine.graphics.Texture;
 import engine.graphics.animation.Animation;
 import engine.object.GameObject;
 
 public class AnimatorComponent extends ObjectComponent {
 	
-	private ArrayTexture texture;
+	private Texture texture;
 	private HashMap<String, Animation> animations;
 	private Animation currentAnimation;
 	private boolean horizontalFlip;
 	
-	public AnimatorComponent(GameObject parentObject, String currentState, Animation currentAnimation, ArrayTexture texture) {
+	public AnimatorComponent(GameObject parentObject, String currentState, Animation currentAnimation, Texture texture) {
 		super(parentObject);
 		this.texture = texture;
 		animations = new HashMap<String, Animation>();
@@ -40,7 +40,7 @@ public class AnimatorComponent extends ObjectComponent {
 		return currentAnimation.getCurrentFrame();
 	}
 	
-	public ArrayTexture getTexture() {
+	public Texture getTexture() {
 		return texture;
 	}
 	

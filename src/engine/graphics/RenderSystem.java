@@ -7,6 +7,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
+import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL31;
@@ -31,9 +32,16 @@ import engine.resource.Resources;
 
 public class RenderSystem {
 	
-	public static final float[] PLANE_VERTS = new float[]{-0.5f,0.5f,0.0f, -0.5f,-0.5f,0.0f, 0.5f,0.5f,0.f, 0.5f,0.5f,0.0f, -0.5f,-0.5f,0.0f, 0.5f,-0.5f, 0.0f};
+	public static final float[] PLANE_VERTS = new float[]{-0.5f,0.5f,0.0f, -0.5f,-0.5f,0.0f, 0.5f,0.5f,0.0f, 0.5f,0.5f,0.0f, -0.5f,-0.5f,0.0f, 0.5f,-0.5f, 0.0f};
 	public static final float[] PLANE_UV = new float[]{0.0f,0.0f,0.0f,1.0f,1.0f,0.0f,1.0f,0.0f,0.0f,1.0f,1.0f,1.0f};
 
+	public static final float[] RECTANGLE_VERTS = new float[]{
+			-0.5f,0.5f,0.5f,0.5f,
+			0.5f,0.5f,0.5f,-0.5f,
+			0.5f,-0.5f,-0.5f,-0.5f,
+			-0.5f,-0.5f,-0.5f,0.5f
+	};
+	
 	public static final float[] PLANE_VERTS_TOP_LEFT = new float[]{
 			0.0f,0.0f,0.0f, 
 			0.0f,-1.0f,0.0f, 
@@ -56,8 +64,12 @@ public class RenderSystem {
 	private ShaderProgram uiShaderProgram;
 	private ShaderProgram tileShaderProgram;
 	private ShaderProgram bgShaderProgram;
+	private ShaderProgram rectangleProgram;
 	
 	private Mesh flatPlane;
+	
+	private int debugRectangleVAO;
+	private int debugRectangleVertexBuffer;
 	
 	private HashMap<Texture, MeshBatch> batches;
 	private ArrayList<AnimatorComponent> animators;
@@ -67,7 +79,7 @@ public class RenderSystem {
 	public RenderSystem(Camera camera) {
 		this.camera = camera;
 		capabilities = GL.createCapabilities();
-		
+
 		debugCallback = new GLDebugMessageCallback() {
 			
 			@Override
@@ -106,14 +118,25 @@ public class RenderSystem {
 		uiShaderProgram = new ShaderProgram(Resources.loadText("shader/ui_vert.shader"), Resources.loadText("shader/ui_frag.shader"));
 		tileShaderProgram = new ShaderProgram(Resources.loadText("shader/tile_vert.shader"), Resources.loadText("shader/tile_frag.shader"));
 		bgShaderProgram = new ShaderProgram(Resources.loadText("shader/bg_vert.shader"), Resources.loadText("shader/bg_frag.shader"));
+		rectangleProgram = new ShaderProgram(Resources.loadText("shader/rectangle_vert.shader"), Resources.loadText("shader/rectangle_frag.shader"));
 		
 		flatPlane = new Mesh(Game.toBuffer(PLANE_VERTS), Game.toBuffer(PLANE_UV));
+		
+		debugRectangleVAO = GL30.glGenVertexArrays();
+		GL30.glBindVertexArray(debugRectangleVAO);
+		
+		debugRectangleVertexBuffer = GL15.glGenBuffers();
+		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, debugRectangleVertexBuffer);
+		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, Game.toBuffer(RECTANGLE_VERTS), GL15.GL_STATIC_DRAW);
+		
+		GL20.glEnableVertexAttribArray(0);
+		GL20.glVertexAttribPointer(0, 2, GL11.GL_FLOAT, false, 0, 0);
 		
 		animators = new ArrayList<AnimatorComponent>();
 		batches = new HashMap<Texture, MeshBatch>();
 		backgrounds = new ArrayList<Background>();
 		
-		GL11.glClearColor(0.0f, 51/255.0f, 153/255.0f, 1.0f);
+		//GL11.glClearColor(0.0f, 51/255.0f, 153/255.0f, 1.0f);
 		//GL11.glEnable(GL11.GL_DEPTH_TEST);
 		
 		GL43.glDebugMessageInsert(GL43.GL_DEBUG_SOURCE_APPLICATION, GL43.GL_DEBUG_TYPE_OTHER, 1, GL43.GL_DEBUG_SEVERITY_NOTIFICATION, "This is a test message!");
@@ -129,7 +152,8 @@ public class RenderSystem {
 	public void render(MeshBatch batch) {
 		GL20.glUseProgram(instanceShaderProgram.getProgramId());
 		
-		GL30.glBindVertexArray(batch.getMesh().getVaoId());
+		batch.getMesh().getVertexArrayObject().bind();
+		//GL30.glBindVertexArray(batch.getMesh().getVaoId());
 		
 		
 		batch.loadBatch(camera);
@@ -144,10 +168,11 @@ public class RenderSystem {
 		
 	}
 
-	public void render(GameObject object, int frame, ArrayTexture tex, boolean horizontalFlip) {
+	public void render(GameObject object, int frame, Texture tex, boolean horizontalFlip) {
 		GL20.glUseProgram(animSpriteShaderProgram.getProgramId());
 		
-		GL30.glBindVertexArray(flatPlane.getVaoId());
+		flatPlane.getVertexArrayObject().bind();
+		//GL30.glBindVertexArray(flatPlane.getVaoId());
 		
 		Matrix4f finalMatrix = camera.getProjectionMatrix().multiply(camera.getWorldMatrix().multiply(object.getTransform().toMatrix()));
 		
@@ -166,7 +191,9 @@ public class RenderSystem {
 
 	public void render(SpriteComponent component) {
 		GL20.glUseProgram(spriteShaderProgram.getProgramId());
-		GL30.glBindVertexArray(flatPlane.getVaoId());
+		
+		flatPlane.getVertexArrayObject().bind();
+		//GL30.glBindVertexArray(flatPlane.getVaoId());
 		
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, component.getTexture().getTextureId());
@@ -185,7 +212,9 @@ public class RenderSystem {
 	public void renderText(String text, Font font, float x, float y, Color color) {
 		
 		GL20.glUseProgram(textShaderProgram.getProgramId());
-		GL30.glBindVertexArray(flatPlane.getVaoId());
+		
+		flatPlane.getVertexArrayObject().bind();
+		//GL30.glBindVertexArray(flatPlane.getVaoId());
 		
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
 		GL11.glBindTexture(GL30.GL_TEXTURE_2D_ARRAY, font.getGlyphs().getTextureId());
@@ -206,9 +235,11 @@ public class RenderSystem {
 		
 	}
 	
-	public void renderLevel(ArrayList<Tile> tiles, ArrayTexture texture) {
+	public void renderLevel(ArrayList<Tile> tiles, Texture texture) {
 		GL20.glUseProgram(tileShaderProgram.getProgramId());
-		GL30.glBindVertexArray(flatPlane.getVaoId());
+		
+		flatPlane.getVertexArrayObject().bind();
+		//GL30.glBindVertexArray(flatPlane.getVaoId());
 		
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
 		GL11.glBindTexture(GL30.GL_TEXTURE_2D_ARRAY, texture.getTextureId());
@@ -224,13 +255,33 @@ public class RenderSystem {
 		}
 	}
 	
+	public void renderDebugRectangles(ArrayList<Tile> tiles, Color color) {
+		GL20.glUseProgram(rectangleProgram.getProgramId());
+		GL30.glBindVertexArray(debugRectangleVAO);
+		
+		GL20.glUniform4fv(rectangleProgram.getUniform("rectangleColor").getLocation(), color.toBuffer());
+		
+		for (Tile tile : tiles) {
+			Transform transform = new Transform(tile.getX(), tile.getY(), 0);
+			Matrix4f finalMatrix = camera.getProjectionMatrix().multiply(camera.getWorldMatrix().multiply(transform.toMatrix()));
+			
+			GL20.glUniformMatrix4fv(rectangleProgram.getUniform("mvpMatrix").getLocation(), false, finalMatrix.toBuffer());
+			GL11.glDrawArrays(GL11.GL_LINES, 0, RECTANGLE_VERTS.length);
+		}
+	}
+	
+	public void renderDebugRectangle(Rectangle rectangle, Color color) {
+		
+	}
+	
 	public void render(Rectangle rect, Color backgroundColor) {
 		GL20.glUseProgram(uiShaderProgram.getProgramId());
 		
 		// Remember to change this calculation when I change the size of the flatplane
 		Matrix4f modelMatrix = Matrix4f.translation(rect.getX(), rect.getY(), 0).multiply(Matrix4f.scale(rect.getWidth(), rect.getHeight(), 1f));
 
-		GL30.glBindVertexArray(flatPlane.getVaoId());
+		flatPlane.getVertexArrayObject().bind();
+		//GL30.glBindVertexArray(flatPlane.getVaoId());
 		
 		GL20.glUniformMatrix4fv(uiShaderProgram.getUniform("modelMatrix").getLocation(), false, modelMatrix.toBuffer());
 		GL20.glUniform4fv(uiShaderProgram.getUniform("backgroundColor").getLocation(), backgroundColor.toBuffer());
@@ -241,7 +292,9 @@ public class RenderSystem {
 	public void renderBackground(Background background) {
 		GL20.glUseProgram(bgShaderProgram.getProgramId());
 		
-		GL30.glBindVertexArray(flatPlane.getVaoId());
+		
+		flatPlane.getVertexArrayObject().bind();
+		//GL30.glBindVertexArray(flatPlane.getVaoId());
 		
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, background.getTexture().getTextureId());
@@ -346,6 +399,9 @@ public class RenderSystem {
 		}
 		
 		flatPlane.destroy();
+		
+		GL15.glDeleteBuffers(debugRectangleVertexBuffer);
+		GL30.glDeleteVertexArrays(debugRectangleVAO);
 		
 		instanceShaderProgram.destroy();
 		textShaderProgram.destroy();

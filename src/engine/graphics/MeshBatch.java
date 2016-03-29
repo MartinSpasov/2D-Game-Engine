@@ -9,6 +9,7 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL33;
 
+import engine.graphics.memory.Buffer;
 import engine.math.Matrix4f;
 
 public class MeshBatch {
@@ -18,7 +19,8 @@ public class MeshBatch {
 	
 	private int maxSize;
 	
-	private int mvpMatrixBufferId;
+	//private int mvpMatrixBufferId;
+	private Buffer mvpMatrixBuffer;
 	
 	private ArrayList<Matrix4f> modelMatrices;
 	
@@ -29,12 +31,15 @@ public class MeshBatch {
 		
 		modelMatrices = new ArrayList<Matrix4f>();
 		
-		GL30.glBindVertexArray(mesh.getVaoId());
+		mesh.getVertexArrayObject().bind();
+		//GL30.glBindVertexArray(mesh.getVaoId());
 		
-		mvpMatrixBufferId = GL15.glGenBuffers();
+		mvpMatrixBuffer = new Buffer(Buffer.ARRAY_BUFFER);
 		
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, mvpMatrixBufferId);
-		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, maxSize * 4 * 16, GL15.GL_DYNAMIC_DRAW);
+		//GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, mvpMatrixBufferId);
+		mvpMatrixBuffer.bind();
+		mvpMatrixBuffer.bufferData(maxSize * 4 * 16, Buffer.DYNAMIC_DRAW);
+		//GL15.glBufferData(GL15.GL_ARRAY_BUFFER, maxSize * 4 * 16, GL15.GL_DYNAMIC_DRAW);
 		
 		for (int i = 0; i < 4; i++) {
 			GL20.glVertexAttribPointer(2 + i, 4, GL11.GL_FLOAT, false, 64, 16 * i);
@@ -54,7 +59,8 @@ public class MeshBatch {
 	}
 	
 	public void loadBatch(Camera camera) {
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, mvpMatrixBufferId);
+		//GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, mvpMatrixBufferId);
+		mvpMatrixBuffer.bind();
 		FloatBuffer buffer = GL15.glMapBuffer(GL15.GL_ARRAY_BUFFER, GL15.GL_WRITE_ONLY).asFloatBuffer();
 		Matrix4f pvMatrix = camera.getProjectionMatrix().multiply(camera.getWorldMatrix());
 		
@@ -79,7 +85,8 @@ public class MeshBatch {
 		}
 		
 		GL15.glUnmapBuffer(GL15.GL_ARRAY_BUFFER);
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+		//GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+		mvpMatrixBuffer.unbind();
 	}
 	
 	public Mesh getMesh() {
@@ -103,6 +110,7 @@ public class MeshBatch {
 	}
 	
 	public void destroy() {
-		GL15.glDeleteBuffers(mvpMatrixBufferId);
+		//GL15.glDeleteBuffers(mvpMatrixBufferId);
+		mvpMatrixBuffer.destroy();
 	}
 }
