@@ -2,12 +2,16 @@
 
 layout(location = 0) in vec4 position;
 layout(location = 1) in vec2 inTextureCoord;
-
-uniform mat4 mvpMatrix;
+layout(location = 2) in int inIndex;
+layout(location = 3) in mat4 modelMatrix;
 
 out vec2 textureCoord;
+flat out int index;
+
+uniform mat4 vpMatrix;
 
 void main() {
-	gl_Position = mvpMatrix * position;
+	gl_Position = vpMatrix * modelMatrix * position;
 	textureCoord = inTextureCoord;
+	index = inIndex;
 }

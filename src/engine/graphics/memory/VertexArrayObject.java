@@ -81,6 +81,10 @@ public class VertexArrayObject {
 		enableAttribute(attribIndex);
 	}
 	
+	public void addArrayBuffer(Buffer buffer) {
+		buffers.add(buffer);
+	}
+	
 	public void enableAttribute(int index) {
 		GL20.glEnableVertexAttribArray(index);
 	}

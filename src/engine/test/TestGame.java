@@ -7,12 +7,12 @@ import org.lwjgl.opengl.GL11;
 
 import engine.Game;
 import engine.Tile;
+import engine.TiledScene;
 import engine.graphics.Color;
 import engine.graphics.Texture;
 import engine.graphics.text.Font;
 import engine.input.KeyListener;
 import engine.object.GameObject;
-import engine.object.component.SpriteComponent;
 import engine.physics.geometry.Rectangle;
 import engine.resource.Resources;
 import engine.sound.Sound;
@@ -32,6 +32,8 @@ public class TestGame extends Game implements KeyListener {
 	private Texture test;
 	
 	private Sound testSound;
+	
+	private TiledScene sc;
 
 	public static void main(String[] args) {
 		new TestGame().run();
@@ -72,9 +74,11 @@ public class TestGame extends Game implements KeyListener {
 		getInput().registerKeyListener(this);
 		
 		test = Resources.loadTexture("megaman.png", Texture.NEAREST_NEIGHBOR);
-		GameObject obj = new GameObject();
-		obj.addComponent(new SpriteComponent(obj, test));
-		getScene().addObject(obj);
+		//GameObject obj = new GameObject();
+		//obj.addComponent(new SpriteComponent(obj, test));
+		//getScene().addObject(obj);
+		
+		sc = new TiledScene(tiles, earthboundTileset);
 
 	}
 	
@@ -93,6 +97,7 @@ public class TestGame extends Game implements KeyListener {
 		font.destroy();
 		testSound.destroy();
 		test.destroy();
+		sc.destroy();
 		super.destroy();
 	}
 	
@@ -100,7 +105,7 @@ public class TestGame extends Game implements KeyListener {
 	@Override
 	public void render() {
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-		getRenderSystem().renderLevel(tiles, earthboundTileset);
+		sc.render(getRenderSystem().getCamera());
 		super.render();
 		//getRenderSystem().renderDebugRectangles(tiles, Color.WHITE);
 		getRenderSystem().renderText("FPS: " + getFps(), font, -0.92f, 0.92f, Color.WHITE);

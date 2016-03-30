@@ -19,6 +19,7 @@ import org.lwjgl.system.MemoryUtil;
 
 import engine.Game;
 import engine.Tile;
+import engine.TiledScene;
 import engine.console.Logger;
 import engine.graphics.shader.ShaderProgram;
 import engine.graphics.text.Font;
@@ -235,16 +236,15 @@ public class RenderSystem {
 		
 	}
 	
-	public void renderLevel(ArrayList<Tile> tiles, Texture texture) {
+	public void renderTiledScene(TiledScene scene) {
 		GL20.glUseProgram(tileShaderProgram.getProgramId());
 		
 		flatPlane.getVertexArrayObject().bind();
-		//GL30.glBindVertexArray(flatPlane.getVaoId());
 		
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
-		GL11.glBindTexture(GL30.GL_TEXTURE_2D_ARRAY, texture.getTextureId());
+		GL11.glBindTexture(GL30.GL_TEXTURE_2D_ARRAY, scene.getTileSheet().getTextureId());
 		
-		for (Tile tile : tiles) {
+		for (Tile tile : scene.getTiles()) {
 			Transform transform = new Transform(tile.getX(), tile.getY(), 0);
 			Matrix4f finalMatrix = camera.getProjectionMatrix().multiply(camera.getWorldMatrix().multiply(transform.toMatrix()));
 			

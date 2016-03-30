@@ -19,7 +19,6 @@ public class MeshBatch {
 	
 	private int maxSize;
 	
-	//private int mvpMatrixBufferId;
 	private Buffer mvpMatrixBuffer;
 	
 	private ArrayList<Matrix4f> modelMatrices;
@@ -110,7 +109,6 @@ public class MeshBatch {
 	}
 	
 	public void destroy() {
-		//GL15.glDeleteBuffers(mvpMatrixBufferId);
 		mvpMatrixBuffer.destroy();
 	}
 }

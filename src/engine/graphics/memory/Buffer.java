@@ -11,6 +11,7 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL21;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL31;
+import org.lwjgl.opengl.GL33;
 import org.lwjgl.opengl.GL40;
 import org.lwjgl.opengl.GL42;
 import org.lwjgl.opengl.GL43;
@@ -75,6 +76,10 @@ public class Buffer {
 		GL15.glBufferData(target, size, usage);
 	}
 	
+	public void vertexAttributeIPointer(int index, int size, int type, boolean normalized, int stride, int pointer) {
+		GL30.glVertexAttribIPointer(index, size, type, stride, pointer);
+	}
+	
 	public void vertexAttributePointer(int index, int size, int type) {
 		GL20.glVertexAttribPointer(index, size, type, false, 0, 0);
 	}
@@ -85,6 +90,10 @@ public class Buffer {
 	
 	public void vertexAttributePointer(int index, int size, int type, boolean normalized, int stride, int pointer) {
 		GL20.glVertexAttribPointer(index, size, type, normalized, stride, pointer);
+	}
+	
+	public void vertexAttributeDivisor(int index, int divisor) {
+		GL33.glVertexAttribDivisor(index, divisor);
 	}
 	
 	public void bind() {
