@@ -1,6 +1,7 @@
 package engine.test;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
@@ -11,6 +12,10 @@ import engine.TiledScene;
 import engine.graphics.Color;
 import engine.graphics.Texture;
 import engine.graphics.text.Font;
+import engine.graphics.text.Text;
+import engine.graphics.ui.UserInterface;
+import engine.graphics.ui.component.Button;
+import engine.graphics.ui.component.ButtonListener;
 import engine.input.KeyListener;
 import engine.object.GameObject;
 import engine.physics.geometry.Rectangle;
@@ -34,6 +39,13 @@ public class TestGame extends Game implements KeyListener {
 	private Sound testSound;
 	
 	private TiledScene sc;
+	private Text testT;
+	private Text testT2;
+	
+	private Button testB;
+	private UserInterface ui;
+	
+	private Random rand;
 
 	public static void main(String[] args) {
 		new TestGame().run();
@@ -79,7 +91,44 @@ public class TestGame extends Game implements KeyListener {
 		//getScene().addObject(obj);
 		
 		sc = new TiledScene(tiles, earthboundTileset);
+		testT = new Text("Welcome to Jawa!", font);
+		testT2 = new Text("Jawa is Powerful!", font);
+		
+		ui = new UserInterface(this);
+		getInput().registerMouseButtonListener(ui);
+		getInput().registerMouseMovementListener(ui);
+		rand = new Random();
+		testB = new Button(new Rectangle(0.5f,0.2f), "Test", font);
+		testB.registerButtonListener(new ButtonListener() {
 
+			@Override
+			public void onPress(Button source) {
+				switch(rand.nextInt(6)) {
+				case 0:
+					source.setBackgroundColor(Color.BLUE);
+					break;
+				case 1:
+					source.setBackgroundColor(Color.CYAN);
+					break;
+				case 2:
+					source.setBackgroundColor(Color.GREEN);
+					break;
+				case 3:
+					source.setBackgroundColor(Color.MAGENTA);
+					break;
+				case 4:
+					source.setBackgroundColor(Color.RED);
+					break;
+				case 5:
+					source.setBackgroundColor(Color.YELLOW);
+					break;
+				default:
+					source.setBackgroundColor(Color.WHITE);
+				}
+			}
+			
+		});
+		ui.addUserInterfaceComponent(testB);
 	}
 	
 	
@@ -98,6 +147,8 @@ public class TestGame extends Game implements KeyListener {
 		testSound.destroy();
 		test.destroy();
 		sc.destroy();
+		testT.destroy();
+		testT2.destroy();
 		super.destroy();
 	}
 	
@@ -108,7 +159,10 @@ public class TestGame extends Game implements KeyListener {
 		sc.render(getRenderSystem().getCamera());
 		super.render();
 		//getRenderSystem().renderDebugRectangles(tiles, Color.WHITE);
-		getRenderSystem().renderText("FPS: " + getFps(), font, -0.92f, 0.92f, Color.WHITE);
+		//getRenderSystem().renderText("FPS: " + getFps(), font, -0.92f, 0.92f, Color.WHITE);
+		getRenderSystem().renderText(testT, font, -0.92f, 0.92f, Color.WHITE);
+		getRenderSystem().renderText(testT2, font, -0.92f, -0.92f, Color.WHITE);
+		ui.tick(16f);
 	}
 
 	@Override

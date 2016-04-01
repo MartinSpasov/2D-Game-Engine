@@ -124,6 +124,7 @@ public class TiledScene extends Scene {
 	}
 	
 	public void destroy() {
+		tileShaderProgram.destroy();
 		tileVAO.destroy();
 	}
 

@@ -5,11 +5,12 @@ import java.util.ArrayList;
 import engine.Game;
 import engine.graphics.Color;
 import engine.graphics.text.Font;
+import engine.graphics.text.Text;
 import engine.physics.geometry.Rectangle;
 
 public class Button extends UserInterfaceComponent {
 
-	private String text;
+	private Text text;
 	private Font font;
 	private Color textColor;
 	
@@ -17,7 +18,7 @@ public class Button extends UserInterfaceComponent {
 	
 	public Button(Rectangle bounds, String text, Font font) {
 		super(bounds);
-		this.text = text;
+		this.text = new Text(text, font);
 		this.font = font;
 		textColor = Color.BLACK;
 		listeners = new ArrayList<ButtonListener>();

@@ -1,10 +1,11 @@
 #version 430
 
 in vec2 textureCoord;
+flat in int letter;
 
 out vec4 color;
 
-uniform int letter;
+//uniform int letter;
 uniform sampler2DArray diffuseTexture;
 uniform vec4 textColor;
 

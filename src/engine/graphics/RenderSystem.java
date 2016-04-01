@@ -1,5 +1,6 @@
 package engine.graphics;
 
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -23,6 +24,7 @@ import engine.TiledScene;
 import engine.console.Logger;
 import engine.graphics.shader.ShaderProgram;
 import engine.graphics.text.Font;
+import engine.graphics.text.Text;
 import engine.math.Matrix4f;
 import engine.object.GameObject;
 import engine.object.Transform;
@@ -210,6 +212,7 @@ public class RenderSystem {
 		
 	}
 	
+	@Deprecated
 	public void renderText(String text, Font font, float x, float y, Color color) {
 		
 		GL20.glUseProgram(textShaderProgram.getProgramId());
@@ -304,6 +307,30 @@ public class RenderSystem {
 		GL20.glUniform1f(bgShaderProgram.getUniform("xOffset").getLocation(), background.getXOffset());
 		
 		GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, flatPlane.getNumVertices());
+	}
+	
+	public void renderText(Text text, Font font, float x, float y, Color color) {
+		GL20.glUseProgram(textShaderProgram.getProgramId());
+		
+		font.getCharVAO().bind();
+		
+		text.getIndexBuffer().bind();
+		text.getIndexBuffer().vertexAttributeIPointer(2, 1, GL11.GL_INT, false, 0, 0);
+		text.getIndexBuffer().vertexAttributeDivisor(2, 1);
+		text.getIndexBuffer().unbind();
+		
+		FloatBuffer modelMatrix = Matrix4f.translation(x, y, 0).multiply(Matrix4f.scale(font.getGlyphWidth(), font.getGlyphHeight(), 1)).toBuffer();
+		
+		// FIXME remove this when I get home
+		GL13.glActiveTexture(GL13.GL_TEXTURE0);
+		font.getGlyphs().bind();
+		
+		GL20.glUniformMatrix4fv(textShaderProgram.getUniform("modelMatrix").getLocation(), false, modelMatrix);
+		GL20.glUniform1i(textShaderProgram.getUniform("diffuseTexture").getLocation(), 0);
+		GL20.glUniform4fv(textShaderProgram.getUniform("textColor").getLocation(), color.toBuffer());
+		GL20.glUniform1f(textShaderProgram.getUniform("xOffset").getLocation(), font.getGlyphWidth());
+		
+		GL31.glDrawArraysInstanced(GL11.GL_TRIANGLES, 0, RenderSystem.PLANE_VERTS.length, text.getNumChars());
 	}
 	
 	public String getOpenGLVersion() {
