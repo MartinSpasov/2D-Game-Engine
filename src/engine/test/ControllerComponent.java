@@ -3,6 +3,7 @@ package engine.test;
 import org.lwjgl.glfw.GLFW;
 
 import engine.Game;
+import engine.input.Input;
 import engine.input.KeyListener;
 import engine.object.GameObject;
 import engine.object.component.ObjectComponent;
@@ -54,70 +55,70 @@ public class ControllerComponent extends ObjectComponent implements KeyListener 
 	
 	@Override
 	public void onKey(long window, int key, int scancode, int action, int mods) {
-		if (key == GLFW.GLFW_KEY_W) {
-			if (action == GLFW.GLFW_PRESS) {
+		if (key == Input.KEY_W) {
+			if (action == Input.PRESS) {
 				w = true;
 			}
-			else if (action == GLFW.GLFW_RELEASE) {
+			else if (action == Input.RELEASE) {
 				w = false;
 			}
 		}
 		
-		if (key == GLFW.GLFW_KEY_S) {
-			if (action == GLFW.GLFW_PRESS) {
+		if (key == Input.KEY_S) {
+			if (action == Input.PRESS) {
 				s = true;
 			}
-			else if (action == GLFW.GLFW_RELEASE) {
+			else if (action == Input.RELEASE) {
 				s = false;
 			}
 		}
 		
-		if (key == GLFW.GLFW_KEY_A) {
-			if (action == GLFW.GLFW_PRESS) {
+		if (key == Input.KEY_A) {
+			if (action == Input.PRESS) {
 				a = true;
 			}
-			else if (action == GLFW.GLFW_RELEASE) {
+			else if (action == Input.RELEASE) {
 				a = false;
 			}
 		}
 		
-		if (key == GLFW.GLFW_KEY_D) {
-			if (action == GLFW.GLFW_PRESS) {
+		if (key == Input.KEY_D) {
+			if (action == Input.PRESS) {
 				d = true;
 			}
-			else if (action == GLFW.GLFW_RELEASE) {
+			else if (action == Input.RELEASE) {
 				d = false;
 			}
 		}
-		if (key == GLFW.GLFW_KEY_Q) {
-			if (action == GLFW.GLFW_PRESS) {
+		if (key == Input.KEY_Q) {
+			if (action == Input.PRESS) {
 				q = true;
 			}
-			else if (action == GLFW.GLFW_RELEASE) {
+			else if (action == Input.RELEASE) {
 				q = false;
 			}
 		}
-		if (key == GLFW.GLFW_KEY_E) {
-			if (action == GLFW.GLFW_PRESS) {
+		if (key == Input.KEY_E) {
+			if (action == Input.PRESS) {
 				e = true;
 			}
-			else if (action == GLFW.GLFW_RELEASE) {
+			else if (action == Input.RELEASE) {
 				e = false;
 			}
 		}
-		if (key == GLFW.GLFW_KEY_LEFT_CONTROL) {
+		if (key == Input.KEY_LEFT_CONTROL) {
 			if (action == GLFW.GLFW_PRESS) {
 				ctrl = true;
 			}
-			else if (action == GLFW.GLFW_RELEASE) {
+			else if (action == Input.RELEASE) {
 				ctrl = false;
 			}
 		}
-		if (key == GLFW.GLFW_KEY_SPACE) {
-			if (action == GLFW.GLFW_PRESS) {
+		if (key == Input.KEY_SPACE) {
+			if (action == Input.PRESS) {
 				space = true;
 			}
-			else if (action == GLFW.GLFW_RELEASE) {
+			else if (action == Input.RELEASE) {
 				space = false;
 			}
 		}

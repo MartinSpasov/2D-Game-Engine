@@ -1,10 +1,11 @@
 package engine.object.component;
 
 import engine.Game;
+import engine.graphics.RenderSystem;
 import engine.graphics.Texture;
 import engine.object.GameObject;
 
-public class SpriteComponent extends ObjectComponent {
+public class SpriteComponent extends RenderableComponent {
 
 	private Texture texture;
 	private boolean horizontalFlip;
@@ -37,12 +38,16 @@ public class SpriteComponent extends ObjectComponent {
 
 	@Override
 	public void tick(float delta, Game game) {
-		game.getRenderSystem().addSpriteComponent(this);
+		
+	}
+
+	@Override
+	public void render(RenderSystem renderer) {
+		renderer.renderSprite(getParentObject().getTransform(), texture, horizontalFlip, verticalFlip);
 	}
 
 	@Override
 	public <T> void receiveMessage(String message, T param) {
-		// TODO Auto-generated method stub
 		
 	}
 

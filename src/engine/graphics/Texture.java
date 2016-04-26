@@ -31,10 +31,12 @@ public class Texture {
 	
 	private int handle;
 	private int target;
+	private int unit;
 	
-	public Texture(int target) {
+	public Texture(int target, int unit) {
 		handle = GL11.glGenTextures();
 		this.target = target;
+		this.unit = unit;
 	}
 	
 	public void bufferTexture2D(ByteBuffer data, int width, int height, int filtering) {
@@ -68,6 +70,7 @@ public class Texture {
 	}
 	
 	public void bind() {
+		GL13.glActiveTexture(GL13.GL_TEXTURE0 + unit);
 		GL11.glBindTexture(target, handle);
 	}
 	

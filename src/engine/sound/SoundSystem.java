@@ -35,9 +35,19 @@ public class SoundSystem {
 	}
 	
 	public void playSound(Sound sound, SoundSource source) {
+		
+		int state = AL10.alGetSourcei(source.getSourceId(), AL10.AL_SOURCE_STATE);
+				
+		if (state == AL10.AL_PLAYING) {
+			AL10.alSourceStop(source.getSourceId());
+			AL10.alSourceUnqueueBuffers(source.getSourceId());
+		}
+		else if (state == AL10.AL_STOPPED) {
+			AL10.alSourceUnqueueBuffers(source.getSourceId());
+		}
+		
 		AL10.alSourceQueueBuffers(source.getSourceId(), sound.getBufferId());
 		AL10.alSourcePlay(source.getSourceId());
-		AL10.alSourceUnqueueBuffers(source.getSourceId());
 	}
 	
 	public void setGain(float gain) {

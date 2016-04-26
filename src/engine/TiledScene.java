@@ -6,11 +6,9 @@ import java.util.ArrayList;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL31;
 
-import engine.graphics.Camera;
 import engine.graphics.RenderSystem;
 import engine.graphics.Texture;
 import engine.graphics.memory.Buffer;
@@ -95,24 +93,23 @@ public class TiledScene extends Scene {
 
 	}
 	
-	public void render(Camera camera) {
+	@Override
+	public void render(RenderSystem renderer) {
 		GL20.glUseProgram(tileShaderProgram.getProgramId());
-		
-		//batch.getMesh().getVertexArrayObject().bind();
-		//GL30.glBindVertexArray(batch.getMesh().getVaoId());
+
 		tileVAO.bind();
-		
-		//batch.loadBatch(camera);
-		
-		// Diffuse Texture
-		GL13.glActiveTexture(GL13.GL_TEXTURE0);
-		//GL11.glBindTexture(GL11.GL_TEXTURE_2D, batch.getTexture().getTextureId());
 		tileSheet.bind();
-		GL20.glUniform1i(tileShaderProgram.getUniform("tilesheet").getLocation(), 0);
-		GL20.glUniformMatrix4fv(tileShaderProgram.getUniform("vpMatrix").getLocation(), false, camera.getProjectionMatrix().multiply(camera.getWorldMatrix()).toBuffer());
 		
-		//GL20.glEnableVertexAttribArray(0);
+		GL20.glUniform1i(tileShaderProgram.getUniform("tilesheet").getLocation(), 0);
+		GL20.glUniformMatrix4fv(tileShaderProgram.getUniform("vpMatrix").getLocation(), false, renderer.getCamera().getProjectionMatrix().multiply(renderer.getCamera().getWorldMatrix()).toBuffer());
+		
 		GL31.glDrawArraysInstanced(GL11.GL_TRIANGLES, 0, RenderSystem.PLANE_VERTS.length, tiles.size());
+		
+		super.render(renderer);
+	}
+	
+	public VertexArrayObject getTileVAO() {
+		return tileVAO;
 	}
 	
 	public ArrayList<Tile> getTiles() {
@@ -125,6 +122,7 @@ public class TiledScene extends Scene {
 	
 	public void destroy() {
 		tileShaderProgram.destroy();
+		tileSheet.destroy();
 		tileVAO.destroy();
 	}
 

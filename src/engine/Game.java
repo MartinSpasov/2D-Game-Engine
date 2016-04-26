@@ -3,6 +3,7 @@ package engine;
 import java.nio.FloatBuffer;
 
 import org.lwjgl.BufferUtils;
+import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -29,6 +30,8 @@ public abstract class Game {
 	private boolean shutdown;
 	
 	public Game(String title, int width, int height) {
+		Thread.currentThread().setName("Game Loop");
+		logger.log("lwjgl " + Version.getVersion());
 		logger.log("Initializing subsystems.");
 		window = new Window(title, width, height);
 		
@@ -93,7 +96,8 @@ public abstract class Game {
 	
 	public void render() {
 		//GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-		renderSystem.renderAll();
+		scene.render(renderSystem);
+		//renderSystem.renderAll();
 		//renderSystem.checkError(logger);
 	}
 	
@@ -130,6 +134,10 @@ public abstract class Game {
 	
 	public int getFps() {
 		return fps;
+	}
+	
+	public void setScene(Scene scene) {
+		this.scene = scene;
 	}
 	
 	public void shutdown() {

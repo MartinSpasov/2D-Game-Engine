@@ -3,11 +3,12 @@ package engine.object.component;
 import java.util.HashMap;
 
 import engine.Game;
+import engine.graphics.RenderSystem;
 import engine.graphics.Texture;
 import engine.graphics.animation.Animation;
 import engine.object.GameObject;
 
-public class AnimatorComponent extends ObjectComponent {
+public class AnimatorComponent extends RenderableComponent {
 	
 	private Texture texture;
 	private HashMap<String, Animation> animations;
@@ -59,7 +60,6 @@ public class AnimatorComponent extends ObjectComponent {
 	@Override
 	public void tick(float delta, Game game) {
 		currentAnimation.tick(delta);
-		game.getRenderSystem().addAnimatorComponent(this);
 	}
 
 	@Override
@@ -81,6 +81,11 @@ public class AnimatorComponent extends ObjectComponent {
 		else if (message.equals("SETCURRENTFRAME") && param instanceof Integer) {
 			currentAnimation.setCurrentFrame(0);
 		}
+	}
+
+	@Override
+	public void render(RenderSystem renderer) {
+		renderer.renderAnimationFrame(getParentObject().getTransform(), currentAnimation.getCurrentFrame(), texture, horizontalFlip);
 	}
 
 

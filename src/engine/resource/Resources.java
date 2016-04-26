@@ -46,7 +46,7 @@ public class Resources {
 		return string.toString();
 	}
 	
-	public static Texture loadArrayTexture(String file, int rows, int columns, int filtering) {
+	public static Texture loadArrayTexture(String file, int rows, int columns, int filtering, int unit) {
 		ByteBuffer buffer = null;
 		int width = 0;
 		int height = 0;
@@ -81,7 +81,7 @@ public class Resources {
 			e.printStackTrace();
 		}
 		
-		Texture texture = new Texture(Texture.TEXTURE_2D_ARRAY);
+		Texture texture = new Texture(Texture.TEXTURE_2D_ARRAY, unit);
 		texture.bind();
 		texture.bufferTexture3D(buffer, width, height, depth, filtering);
 		texture.unbind();
@@ -89,13 +89,13 @@ public class Resources {
 		return texture;
 	}
 	
-	public static Texture loadTexture(String fileName, int filtering) {
+	public static Texture loadTexture(String fileName, int filtering, int unit) {
 		IntBuffer width = BufferUtils.createIntBuffer(1);
 		IntBuffer height = BufferUtils.createIntBuffer(1);
 		IntBuffer channels = BufferUtils.createIntBuffer(1);
 		ByteBuffer data = STBImage.stbi_load(PATH + "texture/" + fileName, width, height, channels, 4);
 		
-		Texture texture = new Texture(Texture.TEXTURE_2D);
+		Texture texture = new Texture(Texture.TEXTURE_2D, unit);
 		texture.bind();
 		texture.bufferTexture2D(data, width.get(0), height.get(0), filtering);
 		texture.unbind();
@@ -111,7 +111,7 @@ public class Resources {
 		return new Sound(data, sampleRate.get(0));
 	}
 	
-	public static Font loadFont(String fontAtlas, String fontDesc, int width, int height, Window window) {
+	public static Font loadFont(String fontAtlas, String fontDesc, int width, int height, Window window, int unit) {
 		IntBuffer imageWidth = BufferUtils.createIntBuffer(1);
 		IntBuffer imageHeight = BufferUtils.createIntBuffer(1);
 		IntBuffer channels = BufferUtils.createIntBuffer(1);
@@ -174,7 +174,7 @@ public class Resources {
 		float glyphHeight = (2.0f / window.getHeight()) * height;
 
 		
-		Texture texture = new Texture(Texture.TEXTURE_2D_ARRAY);
+		Texture texture = new Texture(Texture.TEXTURE_2D_ARRAY, unit);
 		texture.bind();
 		texture.bufferTexture3D(newData, width, height, charCount, Texture.LINEAR);
 		texture.unbind();

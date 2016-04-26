@@ -2,8 +2,6 @@ package engine.graphics;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
-import java.util.HashMap;
-
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
@@ -13,23 +11,16 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL31;
 import org.lwjgl.opengl.GL43;
-import org.lwjgl.opengl.GL45;
 import org.lwjgl.opengl.GLCapabilities;
 import org.lwjgl.opengl.GLDebugMessageCallback;
 import org.lwjgl.system.MemoryUtil;
 
 import engine.Game;
-import engine.Tile;
-import engine.TiledScene;
-import engine.console.Logger;
 import engine.graphics.shader.ShaderProgram;
 import engine.graphics.text.Font;
 import engine.graphics.text.Text;
 import engine.math.Matrix4f;
-import engine.object.GameObject;
 import engine.object.Transform;
-import engine.object.component.AnimatorComponent;
-import engine.object.component.SpriteComponent;
 import engine.physics.geometry.Rectangle;
 import engine.resource.Resources;
 
@@ -64,8 +55,6 @@ public class RenderSystem {
 	private ShaderProgram textShaderProgram;
 	private ShaderProgram spriteShaderProgram;
 	private ShaderProgram animSpriteShaderProgram;
-	private ShaderProgram uiShaderProgram;
-	private ShaderProgram tileShaderProgram;
 	private ShaderProgram bgShaderProgram;
 	private ShaderProgram rectangleProgram;
 	
@@ -73,9 +62,6 @@ public class RenderSystem {
 	
 	private int debugRectangleVAO;
 	private int debugRectangleVertexBuffer;
-	
-	private HashMap<Texture, MeshBatch> batches;
-	private ArrayList<AnimatorComponent> animators;
 	
 	private ArrayList<Background> backgrounds;
 	
@@ -118,8 +104,6 @@ public class RenderSystem {
 		textShaderProgram = new ShaderProgram(Resources.loadText("shader/text_vert.shader"), Resources.loadText("shader/text_frag.shader"));
 		spriteShaderProgram = new ShaderProgram(Resources.loadText("shader/default_vert.shader"), Resources.loadText("shader/sprite_frag.shader"));
 		animSpriteShaderProgram = new ShaderProgram(Resources.loadText("shader/default_vert.shader"), Resources.loadText("shader/animsprite_frag.shader"));
-		uiShaderProgram = new ShaderProgram(Resources.loadText("shader/ui_vert.shader"), Resources.loadText("shader/ui_frag.shader"));
-		tileShaderProgram = new ShaderProgram(Resources.loadText("shader/tile_vert.shader"), Resources.loadText("shader/tile_frag.shader"));
 		bgShaderProgram = new ShaderProgram(Resources.loadText("shader/bg_vert.shader"), Resources.loadText("shader/bg_frag.shader"));
 		rectangleProgram = new ShaderProgram(Resources.loadText("shader/rectangle_vert.shader"), Resources.loadText("shader/rectangle_frag.shader"));
 		
@@ -134,9 +118,7 @@ public class RenderSystem {
 		
 		GL20.glEnableVertexAttribArray(0);
 		GL20.glVertexAttribPointer(0, 2, GL11.GL_FLOAT, false, 0, 0);
-		
-		animators = new ArrayList<AnimatorComponent>();
-		batches = new HashMap<Texture, MeshBatch>();
+
 		backgrounds = new ArrayList<Background>();
 		
 		//GL11.glClearColor(0.0f, 51/255.0f, 153/255.0f, 1.0f);
@@ -171,13 +153,13 @@ public class RenderSystem {
 		
 	}
 
-	public void render(GameObject object, int frame, Texture tex, boolean horizontalFlip) {
+	public void renderAnimationFrame(Transform transform, int frame, Texture tex, boolean horizontalFlip) {
 		GL20.glUseProgram(animSpriteShaderProgram.getProgramId());
 		
 		flatPlane.getVertexArrayObject().bind();
 		//GL30.glBindVertexArray(flatPlane.getVaoId());
 		
-		Matrix4f finalMatrix = camera.getProjectionMatrix().multiply(camera.getWorldMatrix().multiply(object.getTransform().toMatrix()));
+		Matrix4f finalMatrix = camera.getProjectionMatrix().multiply(camera.getWorldMatrix().multiply(transform.toMatrix()));
 		
 		// Diffuse Texture
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
@@ -192,93 +174,55 @@ public class RenderSystem {
 		GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, flatPlane.getNumVertices());
 	}
 
-	public void render(SpriteComponent component) {
+	public void renderSprite(Transform transform, Texture texture, boolean hFlip, boolean vFlip) {
 		GL20.glUseProgram(spriteShaderProgram.getProgramId());
 		
 		flatPlane.getVertexArrayObject().bind();
-		//GL30.glBindVertexArray(flatPlane.getVaoId());
 		
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, component.getTexture().getTextureId());
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getTextureId());
 		
-		Matrix4f finalMatrix = camera.getProjectionMatrix().multiply(camera.getWorldMatrix().multiply(component.getParentObject().getTransform().toMatrix()));
+		Matrix4f finalMatrix = camera.getProjectionMatrix().multiply(camera.getWorldMatrix().multiply(transform.toMatrix()));
 		
 		GL20.glUniformMatrix4fv(spriteShaderProgram.getUniform("mvpMatrix").getLocation(), false, finalMatrix.toBuffer());
-		GL20.glUniform1i(spriteShaderProgram.getUniform("horizontalFlip").getLocation(), (component.isHorizontallyFlipped()) ? GL11.GL_TRUE:GL11.GL_FALSE);
-		GL20.glUniform1i(spriteShaderProgram.getUniform("verticalFlip").getLocation(), (component.isVerticallyFlipped()) ? GL11.GL_TRUE:GL11.GL_FALSE);
+		GL20.glUniform1i(spriteShaderProgram.getUniform("horizontalFlip").getLocation(), (hFlip) ? GL11.GL_TRUE:GL11.GL_FALSE);
+		GL20.glUniform1i(spriteShaderProgram.getUniform("verticalFlip").getLocation(), (vFlip) ? GL11.GL_TRUE:GL11.GL_FALSE);
 		GL20.glUniform1i(spriteShaderProgram.getUniform("sprite").getLocation(), 0);
 		
 		GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, flatPlane.getNumVertices());
 		
 	}
 	
-	@Deprecated
-	public void renderText(String text, Font font, float x, float y, Color color) {
-		
-		GL20.glUseProgram(textShaderProgram.getProgramId());
-		
-		flatPlane.getVertexArrayObject().bind();
-		//GL30.glBindVertexArray(flatPlane.getVaoId());
-		
-		GL13.glActiveTexture(GL13.GL_TEXTURE0);
-		GL11.glBindTexture(GL30.GL_TEXTURE_2D_ARRAY, font.getGlyphs().getTextureId());
-		
-		//float size = 0.1f;
-		for (int i = 0; i < text.length(); i++) {
-			Transform transform = new Transform(x + (i * font.getGlyphWidth()),y,0);
-			transform.setXScale(font.getGlyphWidth());
-			transform.setYScale(font.getGlyphHeight());
-			//transform.setZScale(size);
-			
-			GL20.glUniformMatrix4fv(textShaderProgram.getUniform("modelMatrix").getLocation(), false, transform.toMatrix().toBuffer());
-			GL20.glUniform1i(textShaderProgram.getUniform("letter").getLocation(), font.getCharacterMapping(text.charAt(i)));
-			GL20.glUniform1i(textShaderProgram.getUniform("diffuseTexture").getLocation(), 0);
-			GL20.glUniform4fv(textShaderProgram.getUniform("textColor").getLocation(), color.toBuffer());
-			GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, flatPlane.getNumVertices());
-		}
-		
-	}
-	
-	public void renderTiledScene(TiledScene scene) {
-		GL20.glUseProgram(tileShaderProgram.getProgramId());
-		
-		flatPlane.getVertexArrayObject().bind();
-		
-		GL13.glActiveTexture(GL13.GL_TEXTURE0);
-		GL11.glBindTexture(GL30.GL_TEXTURE_2D_ARRAY, scene.getTileSheet().getTextureId());
-		
-		for (Tile tile : scene.getTiles()) {
-			Transform transform = new Transform(tile.getX(), tile.getY(), 0);
-			Matrix4f finalMatrix = camera.getProjectionMatrix().multiply(camera.getWorldMatrix().multiply(transform.toMatrix()));
-			
-			GL20.glUniformMatrix4fv(tileShaderProgram.getUniform("mvpMatrix").getLocation(), false, finalMatrix.toBuffer());
-			GL20.glUniform1i(tileShaderProgram.getUniform("index").getLocation(), tile.getIndex());
-			GL20.glUniform1i(tileShaderProgram.getUniform("diffuseTexture").getLocation(), 0);
-			GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, flatPlane.getNumVertices());
-		}
-	}
-	
-	public void renderDebugRectangles(ArrayList<Tile> tiles, Color color) {
+	public void renderRectangle(Rectangle rect, Color color, boolean filled) {
 		GL20.glUseProgram(rectangleProgram.getProgramId());
-		GL30.glBindVertexArray(debugRectangleVAO);
+		
+		if (filled) {
+			flatPlane.getVertexArrayObject().bind();
+		}
+		else {
+			GL30.glBindVertexArray(debugRectangleVAO);
+		}
 		
 		GL20.glUniform4fv(rectangleProgram.getUniform("rectangleColor").getLocation(), color.toBuffer());
 		
-		for (Tile tile : tiles) {
-			Transform transform = new Transform(tile.getX(), tile.getY(), 0);
-			Matrix4f finalMatrix = camera.getProjectionMatrix().multiply(camera.getWorldMatrix().multiply(transform.toMatrix()));
+		Transform transform = new Transform(rect.getX(), rect.getY(), 0);
+		transform.setXScale(rect.getWidth());
+		transform.setYScale(rect.getHeight());
+		Matrix4f finalMatrix = camera.getProjectionMatrix().multiply(camera.getWorldMatrix().multiply(transform.toMatrix()));
 			
-			GL20.glUniformMatrix4fv(rectangleProgram.getUniform("mvpMatrix").getLocation(), false, finalMatrix.toBuffer());
+		GL20.glUniformMatrix4fv(rectangleProgram.getUniform("mvpMatrix").getLocation(), false, finalMatrix.toBuffer());
+		
+		if (filled) {
+			GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, flatPlane.getNumVertices());
+		}
+		else {
 			GL11.glDrawArrays(GL11.GL_LINES, 0, RECTANGLE_VERTS.length);
 		}
 	}
 	
-	public void renderDebugRectangle(Rectangle rectangle, Color color) {
-		
-	}
 	
-	public void render(Rectangle rect, Color backgroundColor) {
-		GL20.glUseProgram(uiShaderProgram.getProgramId());
+	public void renderUIRectangle(Rectangle rect, Color color) {
+		GL20.glUseProgram(rectangleProgram.getProgramId());
 		
 		// Remember to change this calculation when I change the size of the flatplane
 		Matrix4f modelMatrix = Matrix4f.translation(rect.getX(), rect.getY(), 0).multiply(Matrix4f.scale(rect.getWidth(), rect.getHeight(), 1f));
@@ -286,8 +230,8 @@ public class RenderSystem {
 		flatPlane.getVertexArrayObject().bind();
 		//GL30.glBindVertexArray(flatPlane.getVaoId());
 		
-		GL20.glUniformMatrix4fv(uiShaderProgram.getUniform("modelMatrix").getLocation(), false, modelMatrix.toBuffer());
-		GL20.glUniform4fv(uiShaderProgram.getUniform("backgroundColor").getLocation(), backgroundColor.toBuffer());
+		GL20.glUniformMatrix4fv(rectangleProgram.getUniform("mvpMatrix").getLocation(), false, modelMatrix.toBuffer());
+		GL20.glUniform4fv(rectangleProgram.getUniform("rectangleColor").getLocation(), color.toBuffer());
 		
 		GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, flatPlane.getNumVertices());
 	}
@@ -341,75 +285,12 @@ public class RenderSystem {
 		return capabilities;
 	}
 	
-	@Deprecated
-	public boolean checkError(Logger logger) {
-		int error = 0;
-		
-		while ((error = GL11.glGetError()) != GL11.GL_NO_ERROR) {
-			switch (error) {
-			case GL11.GL_INVALID_ENUM:
-				logger.log("An OpenGL error has occured: Invalid enum.");
-				break;
-			case GL11.GL_INVALID_VALUE:
-				logger.log("An OpenGL error has occured: Invalid value.");
-				break;
-			case GL11.GL_INVALID_OPERATION:
-				logger.log("An OpenGL error has occured: Invalid operation.");
-				break;
-			case GL11.GL_STACK_OVERFLOW:
-				logger.log("An OpenGL error has occured: Stack overflow.");
-				break;
-			case GL11.GL_STACK_UNDERFLOW:
-				logger.log("An OpenGL error has occured: Stack underflow.");
-				break;
-			case GL11.GL_OUT_OF_MEMORY:
-				logger.log("An OpenGL error has occured: Out of memory.");
-				break;
-			case GL30.GL_INVALID_FRAMEBUFFER_OPERATION:
-				logger.log("An OpenGL error has occured: Invalid framebuffer operation.");
-				break;
-			case GL45.GL_CONTEXT_LOST:
-				logger.log("An OpenGL error has occured: Context lost.");
-				break;
-			default:
-				logger.log("An OpenGL error has occured: Unknown error.");
-			}
-		}
-		
-		return false;
-	}
-	
 	public void renderAll() {
 		for (Background bg : backgrounds) {
 			renderBackground(bg);
 		}
-		for (Texture sprite : batches.keySet()) {
-			MeshBatch batch = batches.get(sprite);
-			render(batch);
-			batch.clear();
-		}
-		for (AnimatorComponent animator : animators) {
-			render(animator.getParentObject(), animator.getCurrentFrame(), animator.getTexture(), animator.isHorizontallyFlipped());
-		}
-		animators.clear();
 	}
-	
-	public void addSpriteComponent(SpriteComponent component) {
-		MeshBatch batch = batches.get(component.getTexture());
-		if (batch == null) {
-			batch = new MeshBatch(flatPlane, component.getTexture(), MAX_BATCH_SIZE);
-			batches.put(component.getTexture(), batch);
-			batch.addToBatch(component.getParentObject().getTransform().toMatrix());
-		}
-		else {
-			batch.addToBatch(component.getParentObject().getTransform().toMatrix());
-		}
-	}
-	
-	public void addAnimatorComponent(AnimatorComponent component) {
-		animators.add(component);
-	}
-	
+
 	public void addBackground(Background background) {
 		backgrounds.add(background);
 	}
@@ -420,11 +301,7 @@ public class RenderSystem {
 	
 	public void destroy() {
 		GL20.glUseProgram(0);
-		
-		for (Texture sprite : batches.keySet()) {
-			batches.get(sprite).destroy();
-		}
-		
+
 		flatPlane.destroy();
 		
 		GL15.glDeleteBuffers(debugRectangleVertexBuffer);
@@ -434,7 +311,6 @@ public class RenderSystem {
 		textShaderProgram.destroy();
 		spriteShaderProgram.destroy();
 		animSpriteShaderProgram.destroy();
-		uiShaderProgram.destroy();
 	}
 	
 	public Camera getCamera() {

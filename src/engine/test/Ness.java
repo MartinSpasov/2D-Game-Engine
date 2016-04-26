@@ -10,6 +10,9 @@ public class Ness extends GameObject {
 
 	public static final float animDelay = 0.16f;
 	
+	//TODO remove
+	public NessController controller;
+	
 	public Ness(Input input, Texture nessSprite) {
 		super();
 		
@@ -18,6 +21,7 @@ public class Ness extends GameObject {
 		NessController controller = new NessController(this);
 		input.registerKeyListener(controller);
 		addComponent(controller);
+		this.controller = controller;
 		
 		
 		// ###################### Animations #####################################

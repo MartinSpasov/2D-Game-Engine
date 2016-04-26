@@ -34,7 +34,8 @@ public class Button extends UserInterfaceComponent {
 	
 	@Override
 	public void tick(float delta, Game game) {
-		game.getRenderSystem().render(getBounds(), getBackgroundColor());
+		game.getRenderSystem().renderUIRectangle(getBounds(), getBackgroundColor());
+		//game.getRenderSystem().render(getBounds(), getBackgroundColor());
 		
 		//float fontX = getBounds().getX() + (getBounds().getWidth() / 2.0f);
 		//float fontY = getBounds().getY() - (getBounds().getHeight() / 2.0f);

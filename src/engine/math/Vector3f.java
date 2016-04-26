@@ -37,7 +37,7 @@ public class Vector3f {
 	}
 	
 	public Vector3f divide(float scalar) {
-		return new Vector3f(x / scalar, y / scalar, z * scalar);
+		return new Vector3f(x / scalar, y / scalar, z / scalar);
 	}
 	
 	public float dot(Vector3f vector) {
@@ -92,7 +92,7 @@ public class Vector3f {
 	}
 	
 	public float norm() {
-		return (float) Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2));
+		return (float) Math.sqrt((x*x) + (y*y) + (z*z));
 	}
 	
 	public boolean equals(Vector3f vector, double epsilon) {
@@ -110,12 +110,8 @@ public class Vector3f {
 	
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null) {
-			return false;
-		}
 		if (obj instanceof Vector3f) {
-			Vector3f vector = (Vector3f) obj;
-			return equals(vector, 0.005);
+			return equals((Vector3f)obj, 0.005);
 		}
 		else {
 			return false;
