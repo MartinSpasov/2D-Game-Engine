@@ -59,6 +59,14 @@ public class Rectangle extends Shape {
 				);
 	}
 	
+	public boolean contains(Point point) {
+		return contains(point.x, point.y);
+	}
+	
+	public boolean contains(float x, float y) {
+		return ((x >= topLeft.x && x <= topRight.x) && (y >= bottomLeft.y && y <= topLeft.y));
+	}
+
 	@Override
 	public void setX(float x) {
 		super.setX(x);
@@ -77,13 +85,6 @@ public class Rectangle extends Shape {
 		bottomRight.y = y - halfHeight;
 	}
 
-	public boolean contains(float x, float y) {
-		float topLeftX = getX() - (width / 2.0f);
-		float topLeftY = getY() + (height / 2.0f);
-		
-		return ((x >= topLeftX && x <= topLeftX + width) && (y <= topLeftY && y >= topLeftY - height));
-	}
-	
 	@Override
 	public String toString() {
 		return ("tl: " + topLeft.toString() + 
@@ -91,7 +92,6 @@ public class Rectangle extends Shape {
 				"\nbl: " + bottomLeft.toString() + 
 				"\nbr: " + bottomRight.toString() + 
 				"\norigin: (" + getX() + ", " + getY() + ")\nwidth: " + width + " height: " + height);
-		//return "x: " + getX() + " y: " + getY() + " width: " + width + " height: " + height;
 	}
 	
 	@Override

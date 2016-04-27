@@ -5,13 +5,14 @@ import java.util.ArrayList;
 import org.lwjgl.glfw.GLFW;
 
 import engine.Game;
-import engine.graphics.ui.component.UserInterfaceComponent;
+import engine.graphics.RenderSystem;
+import engine.graphics.ui.widget.Widget;
 import engine.input.MouseButtonListener;
 import engine.input.MouseMovementListener;
 
 public class UserInterface implements MouseButtonListener, MouseMovementListener {
 
-	private ArrayList<UserInterfaceComponent> components;
+	private ArrayList<Widget> widgets;
 	
 	private float cursorX;
 	private float cursorY;
@@ -20,24 +21,24 @@ public class UserInterface implements MouseButtonListener, MouseMovementListener
 	
 	public UserInterface(Game game) {
 		this.game = game;
-		components = new ArrayList<UserInterfaceComponent>();
+		widgets = new ArrayList<Widget>();
 	}
 	
-	public void addUserInterfaceComponent(UserInterfaceComponent component) {
-		components.add(component);
+	public void addUserInterfaceComponent(Widget component) {
+		widgets.add(component);
 	}
 	
-	public void tick(float delta) {
-		for (UserInterfaceComponent component : components) {
-			component.tick(delta, game);
+	public void render(RenderSystem renderer) {
+		for (Widget widget : widgets) {
+			widget.render(renderer);
 		}
 	}
 
 	@Override
 	public void onMouseButton(long window, int button, int action, int mods) {
-		for (UserInterfaceComponent component : components) {
-			if (component.getBounds().contains(cursorX, cursorY) && button == GLFW.GLFW_MOUSE_BUTTON_1 && action == GLFW.GLFW_PRESS) {
-				component.onClick();
+		for (Widget widget : widgets) {
+			if (widget.getBounds().contains(cursorX, cursorY) && button == GLFW.GLFW_MOUSE_BUTTON_1 && action == GLFW.GLFW_PRESS) {
+				widget.onClick();
 			}
 		}
 	}

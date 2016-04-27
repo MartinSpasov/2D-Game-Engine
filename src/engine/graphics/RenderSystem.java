@@ -1,7 +1,6 @@
 package engine.graphics;
 
 import java.nio.FloatBuffer;
-import java.util.ArrayList;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
@@ -63,8 +62,6 @@ public class RenderSystem {
 	private int debugRectangleVAO;
 	private int debugRectangleVertexBuffer;
 	
-	private ArrayList<Background> backgrounds;
-	
 	public RenderSystem(Camera camera) {
 		this.camera = camera;
 		capabilities = GL.createCapabilities();
@@ -90,7 +87,7 @@ public class RenderSystem {
 					decodedSeverity = "NOTIFY";
 					break;
 				default:
-					decodedSeverity = "";
+					decodedSeverity = "?";
 				}
 				
 				Game.logger.log("[" + decodedSeverity +  "] " + decodedMessage);
@@ -118,8 +115,6 @@ public class RenderSystem {
 		
 		GL20.glEnableVertexAttribArray(0);
 		GL20.glVertexAttribPointer(0, 2, GL11.GL_FLOAT, false, 0, 0);
-
-		backgrounds = new ArrayList<Background>();
 		
 		//GL11.glClearColor(0.0f, 51/255.0f, 153/255.0f, 1.0f);
 		//GL11.glEnable(GL11.GL_DEPTH_TEST);
@@ -285,16 +280,6 @@ public class RenderSystem {
 		return capabilities;
 	}
 	
-	public void renderAll() {
-		for (Background bg : backgrounds) {
-			renderBackground(bg);
-		}
-	}
-
-	public void addBackground(Background background) {
-		backgrounds.add(background);
-	}
-	
 	public void setBackgroundColor(float r, float g, float b, float a) {
 		GL11.glClearColor(r, g, b, a);
 	}
@@ -311,6 +296,8 @@ public class RenderSystem {
 		textShaderProgram.destroy();
 		spriteShaderProgram.destroy();
 		animSpriteShaderProgram.destroy();
+		bgShaderProgram.destroy();
+		rectangleProgram.destroy();
 	}
 	
 	public Camera getCamera() {

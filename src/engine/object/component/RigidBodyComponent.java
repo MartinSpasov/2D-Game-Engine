@@ -1,13 +1,12 @@
 package engine.object.component;
 
 import engine.Game;
+import engine.math.Vector2f;
 import engine.math.Vector3f;
 import engine.object.GameObject;
+import engine.physics.collision.Manifold;
 
 public class RigidBodyComponent extends ObjectComponent {
-
-	//public static final float G = -9.807f;
-	public static final float G = 0;
 	
 	private float mass;
 	
@@ -15,9 +14,12 @@ public class RigidBodyComponent extends ObjectComponent {
 	private Vector3f acceleration;
 	private Vector3f velocity;
 	
+	private Vector3f momentum;
+	
 	private float netTorque;
 	private float angularAcceleration;
 	private float angularVelocity;
+
 	
 	public RigidBodyComponent(GameObject parentObject, float mass) {
 		super(parentObject);
@@ -34,14 +36,21 @@ public class RigidBodyComponent extends ObjectComponent {
 		netForce = netForce.add(force);
 	}
 	
+	public void applyImpulse(Vector3f impulse) {
+		velocity = velocity.add(impulse.divide(mass));
+		momentum = velocity.multiply(mass);
+	}
+	
 	public void applyTorque(float force) {
 		netTorque += force;
 	}
 
 	@Override
 	public void tick(float delta, Game game) {
+		
 		// Apply gravity
-		applyForce(new Vector3f(0, G * mass, 0));
+		applyForce(new Vector3f(0, -game.getScene().getGravity() * mass, 0));
+		
 		acceleration = netForce.divide(mass);
 	
 		netForce.x = 0;
@@ -53,6 +62,7 @@ public class RigidBodyComponent extends ObjectComponent {
 
 		getParentObject().getTransform().translate(displacement.x, displacement.y, displacement.z);
 		velocity = vF;
+		momentum = velocity.multiply(mass);
 
 		// Inertia for flat plane
 		int height = 1;
@@ -68,6 +78,9 @@ public class RigidBodyComponent extends ObjectComponent {
 		angularVelocity = avF;
 		
 		getParentObject().getTransform().setZRot(getParentObject().getTransform().getZRot() + aDisplacement);
+		
+		//getParentObject().broadcastMessage("DIRECTION", new Vector2f(displacement.x, displacement.y));
+		
 	}
 
 	@Override
@@ -75,8 +88,26 @@ public class RigidBodyComponent extends ObjectComponent {
 		if (message.equals("APPLYFORCE") && param instanceof Vector3f) {
 			applyForce((Vector3f)param);
 		}
-		if (message.equals("APPLYTORQUE") && param instanceof Float) {
+		else if (message.equals("APPLYTORQUE") && param instanceof Float) {
 			applyTorque((float)param);
+		}
+		else if (message.equals("APPLYIMPULSE") && param instanceof Vector3f) {
+			applyImpulse((Vector3f)param);
+		}
+		else if (message.equals("COLLISION") && param instanceof Manifold) {
+			
+			Vector2f direction = ((Manifold)param).getDirection();
+			
+			if (direction.equals(Vector2f.Y_AXIS)) {
+				acceleration.x = 0;
+				acceleration.y = 0;
+				acceleration.z = 0;
+				velocity.x = 0;
+				velocity.y = 0;
+				velocity.z = 0;
+				getParentObject().broadcastMessage("GROUNDED", true);
+			}
+
 		}
 	}
 

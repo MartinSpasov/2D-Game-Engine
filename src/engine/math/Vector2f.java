@@ -50,6 +50,11 @@ public class Vector2f {
 		return new Vector2f(x * -1, y * -1);
 	}
 	
+	public void set(float x, float y) {
+		this.x = x;
+		this.y = y;
+	}
+	
 	public float norm() {
 		return (float) Math.sqrt((x*x) + (y*y));
 	}

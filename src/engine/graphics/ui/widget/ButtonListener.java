@@ -1,4 +1,4 @@
-package engine.graphics.ui.component;
+package engine.graphics.ui.widget;
 
 public interface ButtonListener {
 

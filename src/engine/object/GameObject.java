@@ -9,10 +9,6 @@ import engine.object.component.RenderableComponent;
 
 public class GameObject {
 
-	private static int count = 0; 
-	
-	private int id;
-	
 	private Transform transform;
 	
 	private ArrayList<ObjectComponent> components;
@@ -24,7 +20,6 @@ public class GameObject {
 	
 	public GameObject(Transform transform) {
 		this.transform = transform;
-		id = count++;
 		components = new ArrayList<ObjectComponent>();
 		renderableComponents = new ArrayList<RenderableComponent>();
 	}
@@ -63,10 +58,6 @@ public class GameObject {
 
 	public Transform getTransform() {
 		return transform;
-	}
-	
-	public int getId() {
-		return id;
 	}
 
 	

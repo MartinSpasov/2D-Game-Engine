@@ -8,7 +8,7 @@ import engine.input.KeyListener;
 import engine.object.GameObject;
 import engine.object.component.ObjectComponent;
 
-public class ControllerComponent extends ObjectComponent implements KeyListener {
+public class CameraController extends ObjectComponent implements KeyListener {
 
 	private boolean w;
 	private boolean s;
@@ -17,11 +17,11 @@ public class ControllerComponent extends ObjectComponent implements KeyListener 
 	private boolean q;
 	private boolean e;
 	private boolean ctrl;
-	private boolean space;
+	private boolean shift;
 	
 	public static final float SPEED = 3f;
 	
-	public ControllerComponent(GameObject parentObject) {
+	public CameraController(GameObject parentObject) {
 		super(parentObject);
 	}
 
@@ -48,7 +48,7 @@ public class ControllerComponent extends ObjectComponent implements KeyListener 
 		if (ctrl) {
 			getParentObject().getTransform().translate(0, -SPEED * delta, 0);
 		}
-		if (space) {
+		if (shift) {
 			getParentObject().getTransform().translate(0, SPEED * delta, 0);
 		}
 	}
@@ -114,12 +114,12 @@ public class ControllerComponent extends ObjectComponent implements KeyListener 
 				ctrl = false;
 			}
 		}
-		if (key == Input.KEY_SPACE) {
-			if (action == Input.PRESS) {
-				space = true;
+		if (key == Input.KEY_LEFT_SHIFT) {
+			if (action == GLFW.GLFW_PRESS) {
+				shift = true;
 			}
 			else if (action == Input.RELEASE) {
-				space = false;
+				shift = false;
 			}
 		}
 

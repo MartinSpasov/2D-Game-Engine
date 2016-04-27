@@ -6,7 +6,6 @@ import org.lwjgl.openal.ALContext;
 import org.lwjgl.openal.ALDevice;
 
 import engine.console.Logger;
-import engine.resource.Resources;
 
 public class SoundSystem {
 
@@ -19,13 +18,13 @@ public class SoundSystem {
 		
 		backgroundSource = new SoundSource();
 		//capabilities = AL.createCapabilities(arg0)
-		Sound testSound1 = Resources.loadSound("title.ogg");
-		Sound testSound2 = Resources.loadSound("wily.ogg");
-		SoundSource testSource = new SoundSource();
-		AL10.alSourceQueueBuffers(testSource.getSourceId(), testSound1.getBufferId());
-		AL10.alSourceQueueBuffers(testSource.getSourceId(), testSound2.getBufferId());
+		//Sound testSound1 = Resources.loadSound("title.ogg");
+		//Sound testSound2 = Resources.loadSound("wily.ogg");
+		//SoundSource testSource = new SoundSource();
+		//AL10.alSourceQueueBuffers(testSource.getSourceId(), testSound1.getBufferId());
+		//AL10.alSourceQueueBuffers(testSource.getSourceId(), testSound2.getBufferId());
 		
-		AL10.alSourcePlay(testSource.getSourceId());
+		//AL10.alSourcePlay(testSource.getSourceId());
 		
 		setGain(0.5f);
 	}

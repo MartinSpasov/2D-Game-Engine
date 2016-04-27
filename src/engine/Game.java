@@ -102,9 +102,10 @@ public abstract class Game {
 	}
 	
 	public void destroy() {
-		renderSystem.destroy();
+		scene.destroy();
 		soundSystem.destroy();
 		input.destroy();
+		renderSystem.destroy();
 		window.destroy();
 	}
 	

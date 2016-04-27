@@ -2,5 +2,5 @@ package engine.physics.collision;
 
 public interface CollisionResponse {
 
-	public void intersectResponse(Collision collision);
+	public void intersectResponse(Manifold manifold);
 }

@@ -1,14 +1,14 @@
-package engine.graphics.ui.component;
+package engine.graphics.ui.widget;
 
 import java.util.ArrayList;
 
-import engine.Game;
 import engine.graphics.Color;
+import engine.graphics.RenderSystem;
 import engine.graphics.text.Font;
 import engine.graphics.text.Text;
 import engine.physics.geometry.Rectangle;
 
-public class Button extends UserInterfaceComponent {
+public class Button extends Widget {
 
 	private Text text;
 	private Font font;
@@ -31,16 +31,11 @@ public class Button extends UserInterfaceComponent {
 	public void setTextColor(Color textColor) {
 		this.textColor = textColor;
 	}
-	
+
 	@Override
-	public void tick(float delta, Game game) {
-		game.getRenderSystem().renderUIRectangle(getBounds(), getBackgroundColor());
-		//game.getRenderSystem().render(getBounds(), getBackgroundColor());
-		
-		//float fontX = getBounds().getX() + (getBounds().getWidth() / 2.0f);
-		//float fontY = getBounds().getY() - (getBounds().getHeight() / 2.0f);
-		
-		game.getRenderSystem().renderText(text, font, getBounds().getX(), getBounds().getY(), textColor);
+	public void render(RenderSystem renderer) {
+		renderer.renderUIRectangle(getBounds(), getBackgroundColor());
+		renderer.renderText(text, font, getBounds().getX(), getBounds().getY(), textColor);
 	}
 
 	@Override

@@ -95,6 +95,8 @@ public class TiledScene extends Scene {
 	
 	@Override
 	public void render(RenderSystem renderer) {
+		renderBackgrounds(renderer);
+		
 		GL20.glUseProgram(tileShaderProgram.getProgramId());
 
 		tileVAO.bind();
@@ -105,7 +107,8 @@ public class TiledScene extends Scene {
 		
 		GL31.glDrawArraysInstanced(GL11.GL_TRIANGLES, 0, RenderSystem.PLANE_VERTS.length, tiles.size());
 		
-		super.render(renderer);
+		renderObjects(renderer);
+		
 	}
 	
 	public VertexArrayObject getTileVAO() {
