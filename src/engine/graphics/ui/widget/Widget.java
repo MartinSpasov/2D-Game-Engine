@@ -9,9 +9,16 @@ public abstract class Widget {
 	private Rectangle bounds;
 	private Color backgroundColor;
 	
+	private boolean visible;
+	
 	public Widget(Rectangle bounds) {
+		this(bounds, Color.WHITE);
+	}
+	
+	public Widget(Rectangle bounds, Color backgroundColor) {
 		this.bounds = bounds;
-		backgroundColor = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+		this.backgroundColor = backgroundColor;
+		visible = true;
 	}
 	
 	public Rectangle getBounds() {
@@ -22,8 +29,16 @@ public abstract class Widget {
 		return backgroundColor;
 	}
 	
+	public boolean isVisible() {
+		return visible;
+	}
+	
 	public void setBackgroundColor(Color backgroundColor) {
 		this.backgroundColor = backgroundColor;
+	}
+	
+	public void setVisible(boolean visible) {
+		this.visible = visible;
 	}
 	
 	public abstract void render(RenderSystem renderer);

@@ -1,4 +1,6 @@
-package engine.physics.collision;
+package engine.physics.collision.response;
+
+import engine.physics.collision.Manifold;
 
 public interface CollisionResponse {
 

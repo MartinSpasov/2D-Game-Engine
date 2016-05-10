@@ -188,6 +188,25 @@ public class RenderSystem {
 		
 	}
 	
+	public void renderUISprite(Rectangle rect, Texture image, boolean hFlip, boolean vFlip) {
+		GL20.glUseProgram(spriteShaderProgram.getProgramId());
+		
+		// Remember to change this calculation when I change the size of the flatplane
+		Matrix4f modelMatrix = Matrix4f.translation(rect.getX(), rect.getY(), 0).multiply(Matrix4f.scale(rect.getWidth(), rect.getHeight(), 1f));
+
+		flatPlane.getVertexArrayObject().bind();
+		
+		image.bind();
+		//GL30.glBindVertexArray(flatPlane.getVaoId());
+		
+		GL20.glUniformMatrix4fv(spriteShaderProgram.getUniform("mvpMatrix").getLocation(), false, modelMatrix.toBuffer());
+		GL20.glUniform1i(spriteShaderProgram.getUniform("horizontalFlip").getLocation(), (hFlip) ? GL11.GL_TRUE:GL11.GL_FALSE);
+		GL20.glUniform1i(spriteShaderProgram.getUniform("verticalFlip").getLocation(), (vFlip) ? GL11.GL_TRUE:GL11.GL_FALSE);
+		GL20.glUniform1i(spriteShaderProgram.getUniform("sprite").getLocation(), 0);
+		
+		GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, flatPlane.getNumVertices());
+	}
+	
 	public void renderRectangle(Rectangle rect, Color color, boolean filled) {
 		GL20.glUseProgram(rectangleProgram.getProgramId());
 		

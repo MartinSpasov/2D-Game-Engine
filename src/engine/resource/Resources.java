@@ -3,6 +3,7 @@ package engine.resource;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -13,10 +14,13 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 import javax.imageio.ImageIO;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.stb.STBImage;
 import org.lwjgl.stb.STBVorbis;
+
+import org.xml.sax.SAXException;
 
 import engine.Tile;
 import engine.Window;
@@ -182,6 +186,30 @@ public class Resources {
 		return new Font(texture, invalidCharacter, glyphWidth, glyphHeight, characterMap);
 	}
 	
+	public static ArrayList<Tile> loadLevelTMX(String path) {
+		ArrayList<Tile> tiles = null;
+		
+		try {
+			TMXDecoder decoder = new TMXDecoder();
+			tiles = decoder.parse(new FileInputStream(new File(PATH + "level/" + path)));
+		} 
+		catch (SAXException e) {
+			e.printStackTrace();
+		} 
+		catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} 
+		catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} 
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return tiles;
+	}
+	
+	@Deprecated
 	public static ArrayList<Tile> loadLevel(String map, String keys) {
 		HashMap<Color, Integer> keyMap = new HashMap<Color, Integer>();
 		

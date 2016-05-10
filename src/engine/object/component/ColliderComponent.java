@@ -5,7 +5,7 @@ import engine.math.Vector2f;
 import engine.object.GameObject;
 import engine.object.Transform;
 import engine.physics.collision.Manifold;
-import engine.physics.collision.CollisionResponse;
+import engine.physics.collision.response.CollisionResponse;
 import engine.physics.geometry.Shape;
 
 public class ColliderComponent extends ObjectComponent implements CollisionResponse {

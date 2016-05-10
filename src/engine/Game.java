@@ -7,9 +7,11 @@ import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
+import engine.console.Console;
 import engine.console.Logger;
 import engine.graphics.Camera;
 import engine.graphics.RenderSystem;
+import engine.graphics.ui.UserInterface;
 import engine.input.Input;
 import engine.math.Matrix4f;
 import engine.physics.collision.CollisionSystem;
@@ -23,6 +25,8 @@ public abstract class Game {
 	private Window window;
 	private Scene scene;
 	private CollisionSystem collisionSystem;
+	private UserInterface ui; // TODO maybe add this in Scene instead
+	
 	public static Logger logger = new Logger(System.out); // TODO change later
 	
 	private int fps;
@@ -35,8 +39,8 @@ public abstract class Game {
 		logger.log("Initializing subsystems.");
 		window = new Window(title, width, height);
 		
-		renderSystem = new RenderSystem(new Camera(Matrix4f.perspective(-1, 1, 1, -1, 1, 1000)));
-		//renderSystem = new RenderSystem(new Camera(Matrix4f.orthographic(-8, 8, 4.5f, -4.5f, 1, 1000))); // 16 x 9 game units
+		//renderSystem = new RenderSystem(new Camera(Matrix4f.perspective(-1, 1, 1, -1, 1, 1000)));
+		renderSystem = new RenderSystem(new Camera(Matrix4f.orthographic(-8, 8, 4.5f, -4.5f, 1, 1000))); // 16 x 9 game units
 		logger.log(renderSystem.getOpenGLVersion());
 		
 		input = new Input(window);
@@ -45,6 +49,9 @@ public abstract class Game {
 		logger.log("Loading scene.");
 		scene = new Scene();
 		collisionSystem = new CollisionSystem();
+		ui = new UserInterface(this);
+		input.registerMouseButtonListener(ui);
+		input.registerMouseMovementListener(ui);
 	}
 	
 	public void run() {
@@ -56,21 +63,20 @@ public abstract class Game {
 
 		logger.log("Entering loop.");
 		
-		double time1 = 0;
+		//double time1 = 0;
 		
 		while (GLFW.glfwWindowShouldClose(window.getId()) == GL11.GL_FALSE && !shutdown) {
 			currentTime = GLFW.glfwGetTime();
+			
 			GLFW.glfwPollEvents();
 			
-			time1 = GLFW.glfwGetTime();
+			//time1 = GLFW.glfwGetTime();
 			
 			tick((float)delta);
 			
+
 			render();
-			
-			if (GLFW.glfwGetTime() - time1 > 0.01666) {
-				logger.log("ENGINE IS LAGGING!");
-			}
+
 			
 			window.swapBuffers();
 			delta = GLFW.glfwGetTime() - currentTime;
@@ -95,10 +101,9 @@ public abstract class Game {
 	}
 	
 	public void render() {
-		//GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 		scene.render(renderSystem);
-		//renderSystem.renderAll();
-		//renderSystem.checkError(logger);
+		ui.render(renderSystem);
 	}
 	
 	public void destroy() {
@@ -131,6 +136,10 @@ public abstract class Game {
 	
 	public CollisionSystem getCollisionSystem() {
 		return collisionSystem;
+	}
+	
+	public UserInterface getUserInterface() {
+		return ui;
 	}
 	
 	public int getFps() {

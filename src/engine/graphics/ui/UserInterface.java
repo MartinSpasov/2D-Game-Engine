@@ -24,13 +24,14 @@ public class UserInterface implements MouseButtonListener, MouseMovementListener
 		widgets = new ArrayList<Widget>();
 	}
 	
-	public void addUserInterfaceComponent(Widget component) {
-		widgets.add(component);
+	public void addWidget(Widget widget) {
+		widgets.add(widget);
 	}
 	
 	public void render(RenderSystem renderer) {
 		for (Widget widget : widgets) {
-			widget.render(renderer);
+			if (widget.isVisible())
+				widget.render(renderer);
 		}
 	}
 

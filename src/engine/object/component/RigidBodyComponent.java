@@ -79,6 +79,7 @@ public class RigidBodyComponent extends ObjectComponent {
 		
 		getParentObject().getTransform().setZRot(getParentObject().getTransform().getZRot() + aDisplacement);
 		
+		//System.out.println(acceleration.toString() + "\t" + velocity.toString());
 		//getParentObject().broadcastMessage("DIRECTION", new Vector2f(displacement.x, displacement.y));
 		
 	}
@@ -99,14 +100,16 @@ public class RigidBodyComponent extends ObjectComponent {
 			Vector2f direction = ((Manifold)param).getDirection();
 			
 			if (direction.equals(Vector2f.Y_AXIS)) {
-				acceleration.x = 0;
-				acceleration.y = 0;
-				acceleration.z = 0;
-				velocity.x = 0;
-				velocity.y = 0;
-				velocity.z = 0;
+				//acceleration.x = 0;
+				//acceleration.y = 0;
+				//acceleration.z = 0;
+				//velocity.x = 0;
+				if (velocity.y < 0)
+					velocity.y = 0;
+				//velocity.z = 0;
 				getParentObject().broadcastMessage("GROUNDED", true);
 			}
+
 
 		}
 	}
