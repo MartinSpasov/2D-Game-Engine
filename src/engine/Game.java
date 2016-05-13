@@ -7,7 +7,6 @@ import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
-import engine.console.Console;
 import engine.console.Logger;
 import engine.graphics.Camera;
 import engine.graphics.RenderSystem;
@@ -26,7 +25,7 @@ public abstract class Game {
 	private Scene scene;
 	private CollisionSystem collisionSystem;
 	private UserInterface ui; // TODO maybe add this in Scene instead
-	
+
 	public static Logger logger = new Logger(System.out); // TODO change later
 	
 	private int fps;
@@ -38,6 +37,7 @@ public abstract class Game {
 		logger.log("lwjgl " + Version.getVersion());
 		logger.log("Initializing subsystems.");
 		window = new Window(title, width, height);
+		logger.log(window.getGLFWVersion());
 		
 		//renderSystem = new RenderSystem(new Camera(Matrix4f.perspective(-1, 1, 1, -1, 1, 1000)));
 		renderSystem = new RenderSystem(new Camera(Matrix4f.orthographic(-8, 8, 4.5f, -4.5f, 1, 1000))); // 16 x 9 game units
@@ -52,6 +52,7 @@ public abstract class Game {
 		ui = new UserInterface(this);
 		input.registerMouseButtonListener(ui);
 		input.registerMouseMovementListener(ui);
+
 	}
 	
 	public void run() {
@@ -60,16 +61,17 @@ public abstract class Game {
 		double counter = 0;
 		double delta = 0;
 		double currentTime = 0;
-
+		
 		logger.log("Entering loop.");
 		
 		//double time1 = 0;
 		
 		while (GLFW.glfwWindowShouldClose(window.getId()) == GL11.GL_FALSE && !shutdown) {
-			currentTime = GLFW.glfwGetTime();
+			
 			
 			GLFW.glfwPollEvents();
 			
+			currentTime = GLFW.glfwGetTime();
 			//time1 = GLFW.glfwGetTime();
 			
 			tick((float)delta);
@@ -77,7 +79,7 @@ public abstract class Game {
 
 			render();
 
-			
+
 			window.swapBuffers();
 			delta = GLFW.glfwGetTime() - currentTime;
 			

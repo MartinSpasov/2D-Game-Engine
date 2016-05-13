@@ -15,7 +15,7 @@ public class Player extends GameObject {
 	
 	private ColliderComponent collider;
 	
-	public Player(Texture walk, Game game) {
+	public Player(Texture walkTex, Game game) {
 		
 		// ####################### Controls ####################################
 		PlayerController controller = new PlayerController(this);
@@ -32,21 +32,18 @@ public class Player extends GameObject {
 		
 		
 		// ###################### Animations #####################################
-		Animation walkLeft = new Animation(new int[]{4,5,6,7},new float[]{animDelay,animDelay,animDelay,animDelay});
-		Animation walkRight = new Animation(new int[]{0,1,2,3},new float[]{animDelay,animDelay,animDelay,animDelay});
-		Animation idleRight = new Animation(new int[]{8,9}, new float[]{3f,animDelay});
-		Animation idleLeft = new Animation(new int[]{10,11}, new float[]{3f,animDelay});
-		Animation jumpRight = new Animation(new int[]{12}, new float[]{animDelay});
-		Animation jumpLeft = new Animation(new int[]{13}, new float[]{animDelay});
+		Animation walk = new Animation(new int[]{0,1,2,3}, new float[]{animDelay,animDelay,animDelay,animDelay});
+		Animation idle = new Animation(new int[]{4}, new float[]{animDelay});
+		Animation jump = new Animation(new int[]{7}, new float[]{animDelay});
+		Animation sleepy = new Animation(new int[]{5,6}, new float[]{3f, animDelay});
 
-		AnimatorComponent animator = new AnimatorComponent(this, "IDLE_RIGHT", idleRight, walk);
-		animator.addAnimation("WALK_RIGHT", walkRight);
-		animator.addAnimation("WALK_LEFT", walkLeft);
-		//animator.addAnimation("IDLE_RIGHT", idleRight);
-		animator.addAnimation("IDLE_LEFT", idleLeft);
-		animator.addAnimation("JUMP_RIGHT", jumpRight);
-		animator.addAnimation("JUMP_LEFT", jumpLeft);
-		//animator.receiveMessage("PAUSEANIM", true);
+		AnimatorComponent animator = new AnimatorComponent(this, "IDLE", idle, walkTex);
+		
+		animator.addAnimation("WALK", walk);
+		animator.addAnimation("JUMP", jump);
+		animator.addAnimation("SLEEPY", sleepy);
+
+		
 		addComponent(animator);
 		
 		// ####################### Physics ######################################

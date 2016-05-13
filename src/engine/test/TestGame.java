@@ -47,7 +47,7 @@ public class TestGame extends Game implements KeyListener {
 	@Override
 	public void init() {
 
-		charWalk = Resources.loadArrayTexture("player_walk.png", 4, 4, Texture.NEAREST_NEIGHBOR, 0);
+		charWalk = Resources.loadArrayTexture("player_walk.png", 2, 4, Texture.NEAREST_NEIGHBOR, 0);
 		levelTiles = Resources.loadArrayTexture("tiles.png", 20, 15, Texture.NEAREST_NEIGHBOR, 0);
 		uiPanelTex = Resources.loadTexture("Panel_Yellow.png", Texture.NEAREST_NEIGHBOR, 0);
 		

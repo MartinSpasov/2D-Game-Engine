@@ -57,6 +57,10 @@ public class Window extends GLFWWindowSizeCallback {
 		return height;
 	}
 	
+	public String getGLFWVersion() {
+		return GLFW.glfwGetVersionString();
+	}
+	
 	public void setTitle(String title) {
 		GLFW.glfwSetWindowTitle(id, title);
 	}
