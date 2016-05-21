@@ -39,6 +39,7 @@ public class PlayerController extends ObjectComponent implements KeyListener {
 			public void onEnter() {
 				getParentObject().broadcastMessage("STATECHANGE", "IDLE");
 				sleepy = false;
+				sleepyCounter = 0;
 			}
 
 			@Override

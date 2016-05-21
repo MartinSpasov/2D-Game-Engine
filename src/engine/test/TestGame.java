@@ -1,6 +1,7 @@
 package engine.test;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import engine.Game;
 import engine.Scene;
@@ -36,6 +37,11 @@ public class TestGame extends Game implements KeyListener {
 	
 	private boolean showColliders;
 	
+	// Object pool testing
+	private TestObjectPool pool;
+	private ArrayList<TestObject> testObjects;
+	private Random rand;
+	
 	public static void main(String[] args) {
 		new TestGame().run();
 	}
@@ -47,6 +53,10 @@ public class TestGame extends Game implements KeyListener {
 	@Override
 	public void init() {
 
+		pool = new TestObjectPool(10);
+		testObjects = new ArrayList<TestObject>();
+		rand = new Random();
+		
 		charWalk = Resources.loadArrayTexture("player_walk.png", 2, 4, Texture.NEAREST_NEIGHBOR, 0);
 		levelTiles = Resources.loadArrayTexture("tiles.png", 20, 15, Texture.NEAREST_NEIGHBOR, 0);
 		uiPanelTex = Resources.loadTexture("Panel_Yellow.png", Texture.NEAREST_NEIGHBOR, 0);
@@ -102,6 +112,7 @@ public class TestGame extends Game implements KeyListener {
 		super.tick(delta);
 		//getCollisionSystem().narrowScan();
 		getSoundSystem().checkError(Game.logger);
+		System.out.println(pool.toString());
 		//System.out.println("USED MEMORY: " + ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024)) + " MB");
 		//getWindow().setTitle("FPS: " + getFps());
 	}
@@ -142,6 +153,15 @@ public class TestGame extends Game implements KeyListener {
 		}
 		if (key == Input.KEY_ESCAPE && action == Input.PRESS) {
 			shutdown();
+		}
+		if (key == Input.KEY_C && action == Input.PRESS) {
+			testObjects.add(pool.create());
+		}
+		if (key == Input.KEY_X && action == Input.PRESS) {
+			// kill random object
+			int index = rand.nextInt(testObjects.size());
+			testObjects.get(index).kill();
+			testObjects.remove(index);
 		}
 	}
 
