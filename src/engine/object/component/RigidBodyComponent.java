@@ -14,6 +14,7 @@ public class RigidBodyComponent extends ObjectComponent {
 	private Vector3f acceleration;
 	private Vector3f velocity;
 	
+	@SuppressWarnings("unused")
 	private Vector3f momentum;
 	
 	private float netTorque;

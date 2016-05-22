@@ -1,50 +1,129 @@
 package engine.resource;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
-import org.xml.sax.Locator;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.DefaultHandler;
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.Characters;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
 
 import engine.Tile;
 
-public class TMXDecoder extends DefaultHandler {
+public class TMXDecoder {
 	
-	private static final int CSV = 0;
+	public enum Encoding {
+		CSV,
+		BASE64,
+		XML;
+	}
+
+	public static final String TMX_FORMAT_VERSION = "1.0";
 	
 	private ArrayList<Tile> tiles;
-	private XMLReader parser;
 	
-	private boolean parseData;
-	private int dataEncoding;
+	private int levelWidth;
+	private int levelHeight;
 	
-	private StringBuilder sb;
-
-	private int width;
-	private int height;
-
-	public TMXDecoder() throws SAXException, ParserConfigurationException {
+	private int tileWidth;
+	private int tileHeight;
+	
+	private int nextObjectId;
+	
+	private Encoding encoding;
+	
+	private StringBuilder buffer;
+	
+	public TMXDecoder(InputStream input) {
 		tiles = new ArrayList<Tile>();
-		dataEncoding = -1;
-		sb = new StringBuilder();
-		parser = SAXParserFactory.newInstance().newSAXParser().getXMLReader();
-		parser.setContentHandler(this);
-		//parser.parse(new InputSource(new FileInputStream(new File(PATH + "level/" + path))));
+		encoding = Encoding.XML;
+		buffer = new StringBuilder();
+		
+		try {
+			XMLEventReader reader = XMLInputFactory.newInstance().createXMLEventReader(input);
+			
+			while (reader.hasNext()) {
+				XMLEvent event = reader.nextEvent();
+				
+				switch(event.getEventType()) {
+				case XMLEvent.START_ELEMENT:
+					parseTag(event.asStartElement());
+					break;
+				case XMLEvent.CHARACTERS:
+					Characters chars = event.asCharacters();
+					if (!chars.isWhiteSpace()) {
+						String data = chars.getData();
+						for (int i = 0; i < data.length(); i++) {
+							char character = data.charAt(i);
+							if (!Character.isWhitespace(character))
+								buffer.append(data.charAt(i));
+						}
+					}
+					break;
+				case XMLEvent.END_ELEMENT:
+					if (event.asEndElement().getName().toString().equals("data")) {
+						parseData();
+					}
+				}
+			}
+		} 
+		catch (XMLStreamException e) {
+			e.printStackTrace();
+		} 
+		catch (FactoryConfigurationError e) {
+			e.printStackTrace();
+		}
+		catch (NumberFormatException e) {
+			e.printStackTrace();
+		} 
+		catch (InvalidValueException e) {
+			e.printStackTrace();
+		}
+
 	}
 	
-	public ArrayList<Tile> parse(InputStream input) throws IOException, SAXException {
-		parser.parse(new InputSource(input));
+	private void parseTag(StartElement event) throws InvalidValueException {
 		
-		String[] indices = sb.toString().split(",");
+		@SuppressWarnings("unchecked")
+		Iterator<Attribute> iter = event.getAttributes();
 		
+		switch(event.getName().toString()) {
+		case "map":
+			while (iter.hasNext()) {
+				parseMapAttribute(iter.next());
+			}
+			break;
+		case "data":
+			while (iter.hasNext()) {
+				parseDataAttribute(iter.next());
+			}
+			break;
+		}
+		
+	}
+	
+	private void parseData()  {
+		
+		
+		switch (encoding) {
+		case CSV:
+			parseDataCSV();
+			break;
+		default:
+			// TODO throw unsupported encoding exception
+			break;
+		}
+	}
+	
+	private void parseDataCSV() {
+		
+		String[] indices = buffer.toString().split(",");
+
 		int x = 0;
 		int y = 0;
 		
@@ -57,97 +136,114 @@ public class TMXDecoder extends DefaultHandler {
 			}
 			
 			x++;
-			if (x >= width) {
+			if (x >= levelWidth) {
 				x = 0;
 				y++;
 			}
 		}
+	}
+	
+	private void parseMapAttribute(Attribute attrib) throws InvalidValueException {
+		/*
+		 * Unimplemented attributes:
+		 * 
+		 * hexsidelength
+		 * staggeraxis
+		 * staggerindex
+		 * backgroundcolor
+		 * 
+		 * 
+		 * */
 		
+		switch(attrib.getName().toString()) {
+		case "version":
+			if (!attrib.getValue().equals(TMX_FORMAT_VERSION)) {
+				// TODO log warning message
+			}
+			break;
+		case "orientation":
+			if (!attrib.getValue().equals("orthogonal")) {
+				throw new InvalidValueException("orientation", attrib.getValue());
+			}
+			break;
+		case "renderorder":
+			// This does not seem to matter until layers are implemented
+			if (!attrib.getValue().equals("right-down")) {
+				throw new InvalidValueException("renderorder", attrib.getValue());
+			}
+			break;
+		case "width":
+			levelWidth = Integer.parseInt(attrib.getValue());
+			break;
+		case "height":
+			levelHeight = Integer.parseInt(attrib.getValue());
+			break;
+		case "tilewidth":
+			tileWidth = Integer.parseInt(attrib.getValue());
+			break;
+		case "tileHeight":
+			tileHeight = Integer.parseInt(attrib.getValue());
+			break;
+		case "nextobjectid":
+			nextObjectId = Integer.parseInt(attrib.getValue());
+			break;
+		default:
+			// TODO log warning message
+			break;
+		}
+	}
+	
+	private void parseDataAttribute(Attribute attrib) throws InvalidValueException {
+		/*
+		 * Unimplemented attributes:
+		 * 
+		 * compression
+		 * 
+		 * */
+		
+		switch(attrib.getName().toString()) {
+		case "encoding":
+			if (attrib.getValue().equals("csv")) {
+				encoding = Encoding.CSV;
+			}
+			else {
+				throw new InvalidValueException("encoding", attrib.getValue());
+			}
+			break;
+		default:
+			// TODO log warning message
+			break;
+		}
+	}
+	
+	public ArrayList<Tile> getTiles() {
 		return tiles;
 	}
-
-	@Override
-	public void setDocumentLocator(Locator locator) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void startDocument() throws SAXException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void endDocument() throws SAXException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void startPrefixMapping(String prefix, String uri) throws SAXException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void endPrefixMapping(String prefix) throws SAXException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
-		if (qName.equals("data")) {
-			parseData = true;
-			if (atts.getValue("encoding").equals("csv")) {
-				dataEncoding = CSV;
-			}
-		}
-		else if (qName.equals("map")) {
-			width = Integer.parseInt(atts.getValue("width"));
-			height = Integer.parseInt(atts.getValue("height"));
-		}
-	}
-
-	@Override
-	public void endElement(String uri, String localName, String qName) throws SAXException {
-		if (qName.equals("data")) {
-			parseData = false;
-		}
-	}
 	
-	@Override
-	public void characters(char[] ch, int start, int length) throws SAXException {
-		if (parseData) {
-			if (dataEncoding == CSV) {
-
-				for (int i = start; i < start + length; i++) {
-					if (!Character.isWhitespace(ch[i])) {
-						sb.append(ch[i]);
-					}
-				}
-
-			}
-		}
+	public int getLevelWidth() {
+		return levelWidth;
 	}
 
-	@Override
-	public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException {
-		// TODO Auto-generated method stub
-		
+	public int getLevelHeight() {
+		return levelHeight;
 	}
 
-	@Override
-	public void processingInstruction(String target, String data) throws SAXException {
-		// TODO Auto-generated method stub
-		
+	public int getTileWidth() {
+		return tileWidth;
 	}
 
-	@Override
-	public void skippedEntity(String name) throws SAXException {
-		// TODO Auto-generated method stub
-		
+	public int getTileHeight() {
+		return tileHeight;
 	}
-	
+
+	public int getNextObjectId() {
+		return nextObjectId;
+	}
+
+	public Encoding getEncoding() {
+		return encoding;
+	}
+
+
+
 }

@@ -25,6 +25,10 @@ public class CollisionSystem {
 		staticColliders.add(shape);
 	}
 	
+	public void clearStaticColliders() {
+		staticColliders.clear();
+	}
+	
 	public void narrowScan() {
 		for (int i = 0; i < objects.size(); i++) {
 			for (int j = i + 1; j < objects.size(); j++) {

@@ -186,12 +186,7 @@ public class PlayerController extends ObjectComponent implements KeyListener {
 			jumping = true;
 			getParentObject().broadcastMessage("APPLYIMPULSE", new Vector3f(0,350,0));
 		}
-		
-		if (key == Input.KEY_R && action == Input.PRESS) {
-			getParentObject().getTransform().setXPos(0.5f);
-			getParentObject().getTransform().setYPos(-10);
-			getParentObject().getTransform().setZPos(0);
-		}
+
 	}
 
 	@Override

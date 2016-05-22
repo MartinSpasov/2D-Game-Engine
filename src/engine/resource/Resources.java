@@ -14,13 +14,10 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 import javax.imageio.ImageIO;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.stb.STBImage;
 import org.lwjgl.stb.STBVorbis;
-
-import org.xml.sax.SAXException;
 
 import engine.Tile;
 import engine.Window;
@@ -187,26 +184,20 @@ public class Resources {
 	}
 	
 	public static ArrayList<Tile> loadLevelTMX(String path) {
-		ArrayList<Tile> tiles = null;
+		
+		FileInputStream input = null;
 		
 		try {
-			TMXDecoder decoder = new TMXDecoder();
-			tiles = decoder.parse(new FileInputStream(new File(PATH + "level/" + path)));
-		} 
-		catch (SAXException e) {
-			e.printStackTrace();
-		} 
-		catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} 
-		catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} 
-		catch (IOException e) {
+			input = new FileInputStream(new File(PATH + "level/" + path));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		return tiles;
+		
+		TMXDecoder decoder = new TMXDecoder(input);
+		
+		return decoder.getTiles();
 	}
 	
 	@Deprecated

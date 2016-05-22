@@ -47,6 +47,22 @@ public class GameObject {
 		renderableComponents.add(component);
 	}
 	
+	@SuppressWarnings("unchecked")
+	public <T extends ObjectComponent> T getComponent(Class<T> type) {
+		for (ObjectComponent component : components) {
+			if (type.isInstance(component)) {
+				return (T) component;
+			}
+		}
+		for (RenderableComponent component : renderableComponents) {
+			if (type.isInstance(component)) {
+				return (T) component;
+			}
+		}
+		return null;
+		
+	}
+	
 	public <T> void broadcastMessage(String message, T param) {
 		for (ObjectComponent component : components) {
 			component.receiveMessage(message, param);
